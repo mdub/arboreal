@@ -12,7 +12,7 @@ class Node < ActiveRecord::Base
       create_table "nodes", :force => true do |t|
         t.string "name"
         t.integer "parent_id"
-        t.integer "ancestor_id_string"
+        t.string "ancestry_string"
       end
     end
 
@@ -49,8 +49,22 @@ describe "{Arboreal}" do
     end
 
     describe "#ancestors" do
+      
       it "is empty" do
         @australia.ancestors.should be_empty
+      end
+      
+    end
+    
+    describe "#ancestry_string" do
+      it "is blank" do
+        @australia.ancestry_string.should be_blank
+      end
+    end
+
+    describe "#path_string" do
+      it "contains only the id of the root" do
+        @australia.path_string.should == "#{@australia.id},"
       end
     end
     
@@ -61,6 +75,12 @@ describe "{Arboreal}" do
     describe "#parent" do
       it "returns the parent" do
         @melbourne.parent.should == @victoria
+      end
+    end
+    
+    describe "#ancestors" do
+      it "returns all ancestors, depth-first" do
+        @melbourne.ancestors.all.should == [@australia, @victoria]
       end
     end
     

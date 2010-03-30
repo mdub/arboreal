@@ -8,6 +8,8 @@ module Arboreal
       extend Arboreal::ClassMethods
       include Arboreal::InstanceMethods
 
+      before_validation :populate_ancestry_string
+      
     end
     
   end

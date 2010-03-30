@@ -1,4 +1,5 @@
 *.gem
+*.log
 *.sqlite*
 doc
 tmp

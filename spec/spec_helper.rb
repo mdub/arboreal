@@ -5,7 +5,13 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 
 require "rubygems"
 
+gem "activerecord", " ~> 2.3.5"
+
 require "active_record"
+require "logger"
+
+ActiveRecord::Base.logger = Logger.new("spec/test.log")
+ActiveRecord::Base.logger.level = Logger::DEBUG
 
 ActiveRecord::Schema.verbose = false
 
