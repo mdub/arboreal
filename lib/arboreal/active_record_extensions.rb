@@ -1,13 +1,16 @@
 module Arboreal
-  
   module ActiveRecordExtensions
     
     def acts_arboreal
+
       belongs_to :parent, :class_name => self.name
+
+      extend Arboreal::ClassMethods
+      include Arboreal::InstanceMethods
+
     end
     
   end
-  
 end
 
 require 'active_record'
