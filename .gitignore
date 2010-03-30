@@ -1,2 +1,4 @@
 *.gem
+*.sqlite*
 doc
+tmp
