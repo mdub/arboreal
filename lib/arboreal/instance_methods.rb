@@ -1,6 +1,6 @@
 module Arboreal
   module InstanceMethods
-    
+
     def path_string
       "#{ancestry_string}#{id},"
     end
@@ -8,17 +8,31 @@ module Arboreal
     def ancestry_string
       read_attribute(:ancestry_string) || ""
     end
-    
+
     def ancestor_ids
       ancestry_string.split(",").map { |x| x.to_i }
     end
-    
+
     def ancestors
-      self.class.base_class.scoped(:conditions => ["id in (?)", ancestor_ids], :order => [:ancestry_string])
+      base_class.scoped(
+      :conditions => ["id in (?)", ancestor_ids], 
+      :order => [:ancestry_string]
+      )
     end
-    
+
+    def descendants
+      ancestry_pattern = path_string + "%"
+      base_class.scoped(
+      :conditions => ["#{base_class.table_name}.ancestry_string like ?", ancestry_pattern]
+      )
+    end
+
     private
-    
+
+    def base_class
+      self.class.base_class
+    end
+
     def populate_ancestry_string
       self.ancestry_string = (parent.path_string unless parent.nil?)
     end

@@ -84,6 +84,20 @@ describe "{Arboreal}" do
       end
     end
 
+    describe "#descendants" do
+
+      it "includes children" do
+        @australia.descendants.should include(@victoria)
+        @australia.descendants.should include(@nsw)
+      end
+
+      it "includes grand-children" do
+        @australia.descendants.should include(@melbourne)
+        @australia.descendants.should include(@sydney)
+      end
+
+    end
+
   end
   
   describe "leaf node" do
@@ -107,7 +121,13 @@ describe "{Arboreal}" do
     end
 
     describe "#children" do
-      it "is empty" do
+      it "returns an empty collection" do
+        @melbourne.children.should be_empty
+      end
+    end
+
+    describe "#descendants" do
+      it "returns an empty collection" do
         @melbourne.children.should be_empty
       end
     end
