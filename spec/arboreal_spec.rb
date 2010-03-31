@@ -85,14 +85,14 @@ describe "{Arboreal}" do
     end
     
     describe "#ancestry_string" do
-      it "is blank" do
-        @australia.ancestry_string.should be_blank
+      it "is a single dash" do
+        @australia.ancestry_string.should == "-"
       end
     end
 
     describe "#path_string" do
       it "contains only the id of the root" do
-        @australia.path_string.should == "#{@australia.id},"
+        @australia.path_string.should == "-#{@australia.id}-"
       end
     end
 
@@ -138,13 +138,13 @@ describe "{Arboreal}" do
 
     describe "#ancestry_string" do
       it "contains ids of all ancestors" do
-        @melbourne.ancestry_string.should == "#{@australia.id},#{@victoria.id},"
+        @melbourne.ancestry_string.should == "-#{@australia.id}-#{@victoria.id}-"
       end
     end
 
     describe "#path_string" do
       it "contains ids of all ancestors, plus self" do
-        @melbourne.path_string.should == "#{@australia.id},#{@victoria.id},#{@melbourne.id},"
+        @melbourne.path_string.should == "-#{@australia.id}-#{@victoria.id}-#{@melbourne.id}-"
       end
     end
 

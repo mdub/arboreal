@@ -2,15 +2,15 @@ module Arboreal
   module InstanceMethods
 
     def path_string
-      "#{ancestry_string}#{id},"
+      "#{ancestry_string}#{id}-"
     end
 
     def ancestry_string
-      read_attribute(:ancestry_string) || ""
+      read_attribute(:ancestry_string) || "-"
     end
 
     def ancestor_ids
-      ancestry_string.split(",").map { |x| x.to_i }
+      ancestry_string.sub(/^-/, "").split("-").map { |x| x.to_i }
     end
 
     def ancestors
@@ -60,7 +60,7 @@ module Arboreal
     
     def detect_ancestry_change
       if ancestry_string_changed? && !new_record?
-        old_path_string = "#{ancestry_string_was}#{id},"
+        old_path_string = "#{ancestry_string_was}#{id}-"
         @ancestry_change = [old_path_string, path_string]
       end
     end
