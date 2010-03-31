@@ -4,6 +4,7 @@ module Arboreal
     def acts_arboreal
 
       belongs_to :parent, :class_name => self.name
+      has_many   :children, :class_name => self.name, :foreign_key => :parent_id
 
       extend Arboreal::ClassMethods
       include Arboreal::InstanceMethods
