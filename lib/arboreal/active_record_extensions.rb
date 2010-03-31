@@ -11,6 +11,10 @@ module Arboreal
 
       before_validation :populate_ancestry_string
       
+      validate do |record|
+        record.send(:validate_parent_not_ancestor)
+      end
+
     end
     
   end

@@ -47,5 +47,16 @@ module Arboreal
       self.ancestry_string = (parent.path_string unless parent.nil?)
     end
 
+    def validate_parent_not_ancestor
+      if self.id 
+        if parent_id == self.id
+          errors.add(:parent, "can't be the record itself")
+        end
+        if ancestor_ids.include?(self.id)
+          errors.add(:parent, "can't be an ancestor")
+        end
+      end
+    end
+    
   end
 end

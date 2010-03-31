@@ -56,6 +56,18 @@ describe "{Arboreal}" do
       end
     end
 
+    it "cannot be it's own parent" do
+      lambda do
+        @australia.update_attributes!(:parent => @australia)
+      end.should raise_error(ActiveRecord::RecordInvalid)
+    end
+
+    it "cannot be it's own ancestor" do
+      lambda do
+        @australia.update_attributes!(:parent => @melbourne)
+      end.should raise_error(ActiveRecord::RecordInvalid)
+    end
+
   end
     
   describe "root node" do
