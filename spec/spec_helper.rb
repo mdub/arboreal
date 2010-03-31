@@ -5,7 +5,8 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 
 require "rubygems"
 
-gem "activerecord", " ~> 2.3.5"
+ENV["AR_VERSION"] ||= "~> 2.3.5"
+gem "activerecord", ENV["AR_VERSION"]
 
 require "active_record"
 require "logger"
