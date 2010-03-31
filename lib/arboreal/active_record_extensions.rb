@@ -15,6 +15,9 @@ module Arboreal
         record.send(:validate_parent_not_ancestor)
       end
 
+      before_save :detect_ancestry_change
+      after_save  :apply_ancestry_change_to_descendants
+      
     end
     
   end

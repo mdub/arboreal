@@ -58,5 +58,24 @@ module Arboreal
       end
     end
     
+    def detect_ancestry_change
+      if ancestry_string_changed? && !new_record?
+        old_path_string = "#{ancestry_string_was}#{id},"
+        @ancestry_change = [old_path_string, path_string]
+      end
+    end
+    
+    def apply_ancestry_change_to_descendants
+      if @ancestry_change
+        old_ancestry_string, new_ancestry_string = *@ancestry_change
+        connection.update(<<-SQL.squish)
+          UPDATE #{base_class.table_name} 
+            SET ancestry_string = REPLACE(ancestry_string, '#{old_ancestry_string}', '#{new_ancestry_string}')
+            WHERE ancestry_string LIKE '#{old_ancestry_string}%'
+        SQL
+        @ancestry_change = nil
+      end
+    end
+    
   end
 end

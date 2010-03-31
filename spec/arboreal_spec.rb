@@ -168,6 +168,25 @@ describe "{Arboreal}" do
     
   end
 
+  describe "when a node changes parent" do
+
+    before do
+      @nz = Node.create!(:name => "New Zealand")
+      @victoria.update_attributes!(:parent => @nz)
+    end
+    
+    describe "each descendant" do
+      
+      it "follows" do
+        @melbourne.reload
+        @melbourne.ancestors.should include(@nz, @victoria)
+        @melbourne.ancestors.should_not include(@australia)
+      end
+      
+    end
+    
+  end
+  
 end
 
 
