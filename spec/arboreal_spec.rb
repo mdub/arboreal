@@ -96,6 +96,28 @@ describe "{Arboreal}" do
         @australia.descendants.should include(@sydney)
       end
 
+      it "excludes self" do
+        @australia.descendants.should_not include(@australia)
+      end
+
+    end
+
+    describe "#subtree" do
+
+      it "includes children" do
+        @australia.subtree.should include(@victoria)
+        @australia.subtree.should include(@nsw)
+      end
+
+      it "includes grand-children" do
+        @australia.subtree.should include(@melbourne)
+        @australia.subtree.should include(@sydney)
+      end
+
+      it "includes self" do
+        @australia.subtree.should include(@australia)
+      end
+
     end
 
   end

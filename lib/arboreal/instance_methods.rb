@@ -21,9 +21,19 @@ module Arboreal
     end
 
     def descendants
+      ancestry_pattern = 
+      base_class.scoped(
+      :conditions => ["#{base_class.table_name}.ancestry_string like ?", path_string + "%"]
+      )
+    end
+
+    def subtree
       ancestry_pattern = path_string + "%"
       base_class.scoped(
-      :conditions => ["#{base_class.table_name}.ancestry_string like ?", ancestry_pattern]
+      :conditions => [
+        "#{base_class.table_name}.id = ? OR #{base_class.table_name}.ancestry_string like ?",
+        id, path_string + "%"
+      ]
       )
     end
 
