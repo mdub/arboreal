@@ -227,6 +227,18 @@ describe "{Arboreal}" do
     
   end
   
+  describe "node created using find_or_create_by" do
+    
+    before do
+      @tasmania = @australia.children.find_or_create_by_name("Tasmania")
+    end
+    
+    it "still has the right ancestry" do
+      @tasmania.ancestors.should == [@australia]
+    end
+    
+  end
+  
   describe ".rebuild_ancestry" do
 
     before do
