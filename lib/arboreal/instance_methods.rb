@@ -5,10 +5,6 @@ module Arboreal
       "#{ancestry_string}#{id}-"
     end
 
-    def ancestry_string
-      read_attribute(:ancestry_string) || "-"
-    end
-
     def ancestor_ids
       ancestry_string.sub(/^-/, "").split("-").map { |x| x.to_i }
     end
@@ -57,9 +53,11 @@ module Arboreal
     end
 
     def populate_ancestry_string
-      self.ancestry_string = (parent.path_string unless parent.nil?)
+      self.class.send(:with_exclusive_scope) do
+        self.ancestry_string = parent ? parent.path_string : "-"
+      end
     end
-
+    
     def validate_parent_not_ancestor
       if self.id 
         if parent_id == self.id

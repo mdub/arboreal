@@ -36,10 +36,10 @@ describe "{Arboreal}" do
 
   before do
     @australia = Node.create!(:name => "Australia")
-    @victoria = Node.create!(:name => "Victoria", :parent => @australia)
-    @melbourne = Node.create!(:name => "Melbourne", :parent => @victoria)
-    @nsw = Node.create!(:name => "New South Wales", :parent => @australia)
-    @sydney = Node.create!(:name => "Sydney", :parent => @nsw)
+    @victoria = @australia.children.create!(:name => "Victoria")
+    @melbourne = @victoria.children.create!(:name => "Melbourne")
+    @nsw = @australia.children.create!(:name => "New South Wales")
+    @sydney = @nsw.children.create!(:name => "Sydney")
   end
   
   describe "node" do
