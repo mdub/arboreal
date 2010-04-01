@@ -185,6 +185,15 @@ describe "{Arboreal}" do
     end
 
   end
+  
+  describe ".roots" do
+    
+    it "returns root nodes" do
+      @nz = Node.create!(:name => "New Zealand")
+      Node.roots.to_set.should == [@australia, @nz].to_set
+    end
+    
+  end
 
   describe "when a node changes parent" do
 

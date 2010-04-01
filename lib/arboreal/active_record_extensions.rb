@@ -18,6 +18,10 @@ module Arboreal
       before_save :detect_ancestry_change
       after_save  :apply_ancestry_change_to_descendants
       
+      named_scope :roots, {
+        :conditions => ["parent_id IS NULL"]
+      }
+      
     end
     
   end
