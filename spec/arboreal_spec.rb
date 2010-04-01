@@ -227,6 +227,24 @@ describe "{Arboreal}" do
     
   end
   
+  describe ".rebuild_ancestry" do
+
+    before do
+      Node.connection.update("UPDATE nodes SET ancestry_string = 'corrupt'")
+      Node.rebuild_ancestry
+    end
+    
+    it "re-populates all ancestry_strings" do
+      Node.count(:conditions => {:ancestry_string => 'corrupt'}).should == 0
+    end
+
+    it "fixes the hierarchy" do
+      @melbourne.reload.ancestors.should == [@australia, @victoria]
+      @sydney.reload.ancestors.should == [@australia, @nsw]
+    end
+    
+  end
+  
 end
 
 
