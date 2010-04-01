@@ -36,6 +36,15 @@ module Arboreal
       ]
       )
     end
+    
+    def siblings
+      base_class.scoped(
+      :conditions => [
+        "#{base_class.table_name}.id <> ? AND #{base_class.table_name}.parent_id = ?",
+        id, parent_id
+      ]
+      )
+    end
 
     def root
       ancestors.first || self

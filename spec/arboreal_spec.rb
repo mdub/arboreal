@@ -56,6 +56,12 @@ describe "{Arboreal}" do
       end
     end
 
+    describe "#siblings" do
+      it "returns other nodes with the same parent" do
+        @victoria.siblings.should == [@nsw]
+      end
+    end
+    
     it "cannot be it's own parent" do
       lambda do
         @australia.update_attributes!(:parent => @australia)
