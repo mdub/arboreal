@@ -189,6 +189,7 @@ describe "{Arboreal}" do
   describe "when a node changes parent" do
 
     before do
+      @box_hill = Node.create!(:name => "Box Hill", :parent => @melbourne)
       @nz = Node.create!(:name => "New Zealand")
       @victoria.update_attributes!(:parent => @nz)
     end
@@ -196,9 +197,15 @@ describe "{Arboreal}" do
     describe "each descendant" do
       
       it "follows" do
+
         @melbourne.reload
         @melbourne.ancestors.should include(@nz, @victoria)
         @melbourne.ancestors.should_not include(@australia)
+
+        @box_hill.reload
+        @box_hill.ancestors.should include(@nz, @victoria, @melbourne)
+        @box_hill.ancestors.should_not include(@australia)
+
       end
       
     end
