@@ -132,6 +132,14 @@ describe "{Arboreal}" do
 
     end
 
+    describe "#root" do
+      
+     it "is itself" do
+       @australia.root.should == @australia
+     end
+     
+    end
+    
   end
   
   describe "leaf node" do
@@ -149,9 +157,11 @@ describe "{Arboreal}" do
     end
 
     describe "#ancestors" do
+      
       it "returns all ancestors, depth-first" do
         @melbourne.ancestors.all.should == [@australia, @victoria]
       end
+      
     end
 
     describe "#children" do
@@ -165,7 +175,15 @@ describe "{Arboreal}" do
         @melbourne.children.should be_empty
       end
     end
-    
+
+    describe "#root" do
+
+      it "is the root of the tree" do
+        @melbourne.root.should == @australia
+      end
+
+    end
+
   end
 
   describe "when a node changes parent" do

@@ -37,6 +37,10 @@ module Arboreal
       )
     end
 
+    def root
+      ancestors.first || self
+    end
+    
     private
 
     def base_class
