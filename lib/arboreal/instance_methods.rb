@@ -9,37 +9,42 @@ module Arboreal
       ancestry_string.sub(/^-/, "").split("-").map { |x| x.to_i }
     end
 
+    def ancestor_conditions
+      ["id in (?)", ancestor_ids]
+    end
+    
     def ancestors
-      base_class.scoped(
-      :conditions => ["id in (?)", ancestor_ids], 
-      :order => [:ancestry_string]
-      )
+      base_class.scoped(:conditions => ancestor_conditions, :order => [:ancestry_string])
     end
 
+    def descendant_conditions
+      ["#{base_class.table_name}.ancestry_string like ?", path_string + "%"]
+    end
+    
     def descendants
-      ancestry_pattern = 
-      base_class.scoped(
-      :conditions => ["#{base_class.table_name}.ancestry_string like ?", path_string + "%"]
-      )
+      base_class.scoped(:conditions => descendant_conditions)
     end
 
-    def subtree
-      ancestry_pattern = path_string + "%"
-      base_class.scoped(
-      :conditions => [
+    def subtree_conditions
+      [
         "#{base_class.table_name}.id = ? OR #{base_class.table_name}.ancestry_string like ?",
         id, path_string + "%"
       ]
-      )
     end
     
-    def siblings
-      base_class.scoped(
-      :conditions => [
+    def subtree
+      base_class.scoped(:conditions => subtree_conditions)
+    end
+    
+    def sibling_conditions
+      [
         "#{base_class.table_name}.id <> ? AND #{base_class.table_name}.parent_id = ?",
         id, parent_id
       ]
-      )
+    end
+    
+    def siblings
+      base_class.scoped(:conditions => sibling_conditions)
     end
 
     def root
