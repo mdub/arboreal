@@ -14,37 +14,37 @@ module Arboreal
     end
     
     def ancestors
-      base_class.scoped(:conditions => ancestor_conditions, :order => [:ancestry_string])
+      self.class.scoped(:conditions => ancestor_conditions, :order => [:ancestry_string])
     end
 
     def descendant_conditions
-      ["#{base_class.table_name}.ancestry_string like ?", path_string + "%"]
+      ["#{self.class.table_name}.ancestry_string like ?", path_string + "%"]
     end
     
     def descendants
-      base_class.scoped(:conditions => descendant_conditions)
+      self.class.scoped(:conditions => descendant_conditions)
     end
 
     def subtree_conditions
       [
-        "#{base_class.table_name}.id = ? OR #{base_class.table_name}.ancestry_string like ?",
+        "#{self.class.table_name}.id = ? OR #{self.class.table_name}.ancestry_string like ?",
         id, path_string + "%"
       ]
     end
     
     def subtree
-      base_class.scoped(:conditions => subtree_conditions)
+      self.class.scoped(:conditions => subtree_conditions)
     end
     
     def sibling_conditions
       [
-        "#{base_class.table_name}.id <> ? AND #{base_class.table_name}.parent_id = ?",
+        "#{self.class.table_name}.id <> ? AND #{self.class.table_name}.parent_id = ?",
         id, parent_id
       ]
     end
     
     def siblings
-      base_class.scoped(:conditions => sibling_conditions)
+      self.class.scoped(:conditions => sibling_conditions)
     end
 
     def root
@@ -52,10 +52,6 @@ module Arboreal
     end
     
     private
-
-    def base_class
-      self.class.base_class
-    end
 
     def populate_ancestry_string
       self.class.send(:with_exclusive_scope) do
@@ -85,7 +81,7 @@ module Arboreal
       if @ancestry_change
         old_ancestry_string, new_ancestry_string = *@ancestry_change
         connection.update(<<-SQL.squish)
-          UPDATE #{base_class.table_name} 
+          UPDATE #{self.class.table_name} 
             SET ancestry_string = REPLACE(ancestry_string, '#{old_ancestry_string}', '#{new_ancestry_string}')
             WHERE ancestry_string LIKE '#{old_ancestry_string}%'
         SQL
