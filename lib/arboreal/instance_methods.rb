@@ -8,39 +8,17 @@ module Arboreal
     def ancestor_ids
       ancestry_string.sub(/^-/, "").split("-").map { |x| x.to_i }
     end
-
-    def ancestor_conditions
-      ["id in (?)", ancestor_ids]
-    end
     
     def ancestors
       self.class.scoped(:conditions => ancestor_conditions, :order => [:ancestry_string])
     end
 
-    def descendant_conditions
-      ["#{self.class.table_name}.ancestry_string like ?", path_string + "%"]
-    end
-    
     def descendants
       self.class.scoped(:conditions => descendant_conditions)
-    end
-
-    def subtree_conditions
-      [
-        "#{self.class.table_name}.id = ? OR #{self.class.table_name}.ancestry_string like ?",
-        id, path_string + "%"
-      ]
     end
     
     def subtree
       self.class.scoped(:conditions => subtree_conditions)
-    end
-    
-    def sibling_conditions
-      [
-        "#{self.class.table_name}.id <> ? AND #{self.class.table_name}.parent_id = ?",
-        id, parent_id
-      ]
     end
     
     def siblings
@@ -52,6 +30,28 @@ module Arboreal
     end
     
     private
+
+    def ancestor_conditions
+      ["id in (?)", ancestor_ids]
+    end
+
+    def descendant_conditions
+      ["#{self.class.table_name}.ancestry_string like ?", path_string + "%"]
+    end
+
+    def subtree_conditions
+      [
+        "#{self.class.table_name}.id = ? OR #{self.class.table_name}.ancestry_string like ?",
+        id, path_string + "%"
+      ]
+    end
+    
+    def sibling_conditions
+      [
+        "#{self.class.table_name}.id <> ? AND #{self.class.table_name}.parent_id = ?",
+        id, parent_id
+      ]
+    end
 
     def populate_ancestry_string
       self.class.send(:with_exclusive_scope) do
