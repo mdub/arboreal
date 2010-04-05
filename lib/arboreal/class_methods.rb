@@ -24,16 +24,40 @@ module Arboreal
       connection.update(ancestry_extension_sql)
     end
 
+    # Return SQL that will extend ancestry_strings one level further down the hierarchy.
+    #
+    # We use DBMS-specific SQL here, as string-concatenation operators vary.  
+    # As a result, this *may* not work for DBMS that aren't explicitly supported.
+    #
     def ancestry_extension_sql
-      <<-SQL.squish.gsub("<table>", table_name)
-        UPDATE <table>
-        SET ancestry_string = 
-          (SELECT (parent.ancestry_string || CAST(<table>.parent_id AS varchar) || '-')
-             FROM <table> AS parent
-            WHERE parent.id = <table>.parent_id)
-        WHERE ancestry_string IS NULL
-      SQL
+      sql = case connection.adapter_name
+      when /mysql/i
+        <<-SQL
+          UPDATE _arboreals_ AS child
+          JOIN _arboreals_ AS parent ON parent.id = child.parent_id
+          SET child.ancestry_string = CONCAT(parent.ancestry_string, parent.id, '-')
+          WHERE child.ancestry_string IS NULL
+        SQL
+      when /mssql/i
+        <<-SQL
+          UPDATE _arboreals_ AS child
+          JOIN _arboreals_ AS parent ON parent.id = child.parent_id
+          SET child.ancestry_string = (parent.ancestry_string + CAST(parent.id AS varchar) + '-')
+          WHERE child.ancestry_string IS NULL
+        SQL
+      else # SQLite, PostgreSQL, most others (SQL-92)
+        <<-SQL
+          UPDATE _arboreals_
+          SET ancestry_string = (
+            SELECT (parent.ancestry_string || _arboreals_.parent_id || '-')
+            FROM _arboreals_ AS parent
+            WHERE parent.id = _arboreals_.parent_id
+          )
+          WHERE ancestry_string IS NULL
+        SQL
+      end
+      sql.gsub("_arboreals_", table_name).squish
     end
-    
+
   end
 end

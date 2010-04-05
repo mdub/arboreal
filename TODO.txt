@@ -1,7 +1,2 @@
-- implement rebuild_ancestry for other databases
-  - MSSQL
-  - MySQL
-  - PostgreSQL
-
 - install documentation
 - usage documentation
