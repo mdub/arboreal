@@ -9,22 +9,27 @@ module Arboreal
       ancestry_string.sub(/^-/, "").split("-").map { |x| x.to_i }
     end
     
+    # return a scope matching all ancestors of this node
     def ancestors
       self.class.scoped(:conditions => ancestor_conditions, :order => [:ancestry_string])
     end
 
+    # return a scope matching all descendants of this node
     def descendants
       self.class.scoped(:conditions => descendant_conditions)
     end
     
+    # return a scope matching all descendants of this node, AND the node itself
     def subtree
       self.class.scoped(:conditions => subtree_conditions)
     end
     
+    # return a scope matching all siblings of this node (NOT including the node itself)
     def siblings
       self.class.scoped(:conditions => sibling_conditions)
     end
 
+    # return the root of the tree
     def root
       ancestors.first || self
     end

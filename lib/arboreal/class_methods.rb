@@ -1,6 +1,7 @@
 module Arboreal
   module ClassMethods
     
+    # Discard existing ancestry_strings and recompute them from parent relationships.
     def rebuild_ancestry
       clear_ancestry_strings
       populate_root_ancestry_strings
@@ -20,12 +21,16 @@ module Arboreal
     end
 
     def extend_ancestry_strings
-      connection.update(<<-SQL.squish)
-        UPDATE #{table_name}
+      connection.update(ancestry_extension_sql)
+    end
+
+    def ancestry_extension_sql
+      <<-SQL.squish.gsub("<table>", table_name)
+        UPDATE <table>
         SET ancestry_string = 
-          (SELECT (parent.ancestry_string || CAST(#{table_name}.parent_id AS varchar) || '-')
-             FROM #{table_name} AS parent
-            WHERE parent.id = #{table_name}.parent_id)
+          (SELECT (parent.ancestry_string || CAST(<table>.parent_id AS varchar) || '-')
+             FROM <table> AS parent
+            WHERE parent.id = <table>.parent_id)
         WHERE ancestry_string IS NULL
       SQL
     end
