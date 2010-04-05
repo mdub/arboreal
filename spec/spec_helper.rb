@@ -10,8 +10,10 @@ gem "activerecord", ENV["AR_VERSION"]
 
 require "active_record"
 require "logger"
+require "fileutils"
 
-ActiveRecord::Base.logger = Logger.new("spec/test.log")
+FileUtils.mkdir_p("tmp")
+ActiveRecord::Base.logger = Logger.new("tmp/test.log")
 ActiveRecord::Base.logger.level = Logger::DEBUG
 
 ActiveRecord::Schema.verbose = false
@@ -21,7 +23,7 @@ Spec::Runner.configure do |config|
   config.before(:all) do
     ActiveRecord::Base.establish_connection(
     :adapter => 'sqlite3', 
-    :database => 'spec/test.sqlite'
+    :database => 'tmp/test.sqlite'
     )
   end
 
