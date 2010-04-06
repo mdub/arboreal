@@ -36,6 +36,7 @@ module Arboreal
           JOIN _arboreals_ AS parent ON parent.id = child.parent_id
           SET child.ancestry_string = CONCAT(parent.ancestry_string, parent.id, '-')
           WHERE child.ancestry_string IS NULL
+            AND parent.ancestry_string IS NOT NULL
         SQL
       elsif connection.adapter_name == "JDBC" && connection.config[:url] =~ /sqlserver/
         <<-SQL
@@ -44,6 +45,7 @@ module Arboreal
           FROM _arboreals_ AS child
           JOIN _arboreals_ AS parent ON parent.id = child.parent_id
           WHERE child.ancestry_string IS NULL
+            AND parent.ancestry_string IS NOT NULL
         SQL
       else # SQLite, PostgreSQL, most others (SQL-92)
         <<-SQL
@@ -52,6 +54,7 @@ module Arboreal
             SELECT (parent.ancestry_string || _arboreals_.parent_id || '-')
             FROM _arboreals_ AS parent
             WHERE parent.id = _arboreals_.parent_id
+              AND parent.ancestry_string IS NOT NULL
           )
           WHERE ancestry_string IS NULL
         SQL
