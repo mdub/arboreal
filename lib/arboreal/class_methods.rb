@@ -30,19 +30,19 @@ module Arboreal
     # As a result, this *may* not work for DBMS that aren't explicitly supported.
     #
     def ancestry_extension_sql
-      sql = case connection.adapter_name
-      when /mysql/i
+      sql = if connection.adapter_name == "MySQL"
         <<-SQL
           UPDATE _arboreals_ AS child
           JOIN _arboreals_ AS parent ON parent.id = child.parent_id
           SET child.ancestry_string = CONCAT(parent.ancestry_string, parent.id, '-')
           WHERE child.ancestry_string IS NULL
         SQL
-      when /mssql/i
+      elsif connection.adapter_name == "JDBC" && connection.config[:url] =~ /sqlserver/
         <<-SQL
-          UPDATE _arboreals_ AS child
-          JOIN _arboreals_ AS parent ON parent.id = child.parent_id
+          UPDATE child
           SET child.ancestry_string = (parent.ancestry_string + CAST(parent.id AS varchar) + '-')
+          FROM _arboreals_ AS child
+          JOIN _arboreals_ AS parent ON parent.id = child.parent_id
           WHERE child.ancestry_string IS NULL
         SQL
       else # SQLite, PostgreSQL, most others (SQL-92)

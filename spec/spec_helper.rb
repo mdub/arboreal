@@ -23,14 +23,21 @@ DB_CONFIGS = {
     :database => 'tmp/test.sqlite'
   },
   "mysql" => {
-    :database => 'weblog_development',
     :host     => 'localhost',
+    :database => 'weblog_development',
     :username => 'blog',
     :password => ''
   },
   "postgresql" => {
-    :database => 'weblog_development',
     :host     => 'localhost',
+    :database => 'weblog_development',
+  },
+  "jdbcmssql" => {
+    :host     => 'localhost',
+    :port     => 1433,
+    :database => 'weblog_development',
+    :username => 'blog',
+    :password => ''
   }
 }
 
