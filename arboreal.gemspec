@@ -20,11 +20,11 @@ Gem::Specification.new do |s|
   s.author           = "Mike Williams"
   s.email            = "mdub@dogbiscuit.org"
   s.homepage         = "http://github.com/mdub/arboreal"
+  s.has_rdoc         = true
+  s.extra_rdoc_files = ["README.rdoc", "LICENSE"]
+  s.rdoc_options     = ["--title", "Arboreal", "--main", "README.rdoc"]
   s.require_path     = "lib"
-  s.files            = Dir["lib/**/*", "spec/**/*", "Rakefile", "LICENSE"]
+  s.files            = Dir["lib/**/*", "spec/**/*", "Rakefile"] + s.extra_rdoc_files
   s.add_runtime_dependency("activerecord", ">= 2.3.0")
   s.add_development_dependency("rspec", ">= 1.2.9")
-  s.has_rdoc         = true
-  s.extra_rdoc_files = ["LICENSE"]
-  s.rdoc_options     = ["--main", "Arboreal"]
 end

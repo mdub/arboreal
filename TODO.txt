@@ -1,2 +1,4 @@
 - install documentation
 - usage documentation
+
+- test compatibility with single-table inheritance

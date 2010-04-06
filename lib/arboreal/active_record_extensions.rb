@@ -1,6 +1,7 @@
 module Arboreal
   module ActiveRecordExtensions
     
+    # Declares that this ActiveRecord::Base model has a tree-like structure.
     def acts_arboreal
 
       belongs_to :parent, :class_name => self.name
