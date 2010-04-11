@@ -11,6 +11,7 @@ class Node < ActiveRecord::Base
     def self.up
       create_table "nodes", :force => true do |t|
         t.string "name"
+        t.string "type"
         t.integer "parent_id"
         t.string "ancestry_string"
       end
@@ -24,7 +25,7 @@ class Node < ActiveRecord::Base
   
 end
 
-describe "{Arboreal}" do
+describe "Arboreal hierarchy" do
 
   before(:all) do
     Node::Migration.up
@@ -259,4 +260,42 @@ describe "{Arboreal}" do
   
 end
 
+class RedNode < Node; end
+class GreenNode < Node; end
+class BlueNode < Node; end
+  
+describe "polymorphic hierarchy" do
 
+  before(:all) do
+    Node::Migration.up
+  end
+  
+  after(:all) do
+    Node::Migration.down
+  end
+
+  before do
+    @red = RedNode.create!
+    @green = GreenNode.create!(:parent => @red)
+    @blue = BlueNode.create!(:parent => @green)
+  end
+  
+  describe "#descendants" do
+    it "includes nodes of other types" do
+      @red.descendants.should include(@green, @blue)
+    end
+  end
+
+  describe "#subtree" do
+    it "includes nodes of other types" do
+      @red.subtree.should include(@red, @green, @blue)
+    end
+  end
+
+  describe "#ancestors" do
+    it "includes nodes of other types" do
+      @blue.ancestors.should include(@red, @green)
+    end
+  end
+  
+end
