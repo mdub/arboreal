@@ -1,3 +1,5 @@
+require "active_support/core_ext/string/filters"
+
 module Arboreal
   module InstanceMethods
 
