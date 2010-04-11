@@ -2,10 +2,17 @@
 
 Arboreal is yet another extension to ActiveRecord to support tree-shaped
 data structures.
- 
+
 Arboreal surfaces relationships within the tree like +children+,
 +ancestors+, +descendants+, and +siblings+ as scopes, so that additional
 filtering/pagination can be performed.
+ 
+It delegates as much work as possible to the underlying DBMS, making it efficient to:
+
+* fetch all ancestors, descendants or siblings of a node
+* prevent loops in the hierarchy
+* move nodes (or subtrees) around
+* rebuild the hierarchy
 
 == Getting started
 
@@ -30,7 +37,7 @@ Next, you'll need a migration to add an +ancestry_string+ column, and index ther
 
 This assumes that the table concerned already has a +parent_id+ column; if not, add that too (type +integer+, with a supporting index).
 
-Finally, you can declare you model arboreal:
+Finally, you can declare your model arboreal:
 
     class Thing < ActiveRecord::Base
     
@@ -42,7 +49,7 @@ Finally, you can declare you model arboreal:
     
 == Navigating the tree
 
-Arboreal adds the relationships you'd expect:
+Arboreal adds the basic relationships you'd expect:
 
 * <tt>parent</tt>
 * <tt>children</tt>
