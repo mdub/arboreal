@@ -1,4 +1,2 @@
-- install documentation
-- usage documentation
-
 - test compatibility with single-table inheritance
+- test compatibility with AR 3.0.0
