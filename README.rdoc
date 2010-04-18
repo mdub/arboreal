@@ -10,32 +10,33 @@ filtering/pagination can be performed.
 It delegates as much work as possible to the underlying DBMS, making it efficient to:
 
 * fetch all ancestors, descendants or siblings of a node
-* prevent loops in the hierarchy
 * move nodes (or subtrees) around
+* prevent loops
 * rebuild the hierarchy
 
 == Getting started
 
 First, install the "arboreal" gem, and add it to your Rails project's <tt>config/environment.rb</tt>.  
 
-Next, you'll need a migration to add an +ancestry_string+ column, and index thereupon:
+Next, you'll need a migration to add +parent_id+ and +ancestry_string+ columns, and indices:
 
     class MakeThingsArboreal < ActiveRecord::Migration
 
       def self.up
+        add_column "things", "parent_id", :integer
+        add_index "things", ["parent_id"]
         add_column "things", "ancestry_string", :string
         add_index "things", ["ancestry_string"]
-        Thing.rebuild_ancestry      
       end
 
       def self.down
         remove_index "things", ["ancestry_string"]
         remove_column "things", "ancestry_string"
+        remove_index "things", ["parent_id"]
+        remove_column "things", "parent_id"
       end
 
     end
-
-This assumes that the table concerned already has a +parent_id+ column; if not, add that too (type +integer+, with a supporting index).
 
 Finally, you can declare your model arboreal:
 
@@ -46,7 +47,7 @@ Finally, you can declare your model arboreal:
       # .. etc etc ...
       
     end
-    
+
 == Navigating the tree
 
 Arboreal adds the basic relationships you'd expect:
