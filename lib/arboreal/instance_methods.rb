@@ -51,12 +51,12 @@ module Arboreal
     end
 
     def descendant_conditions
-      ["#{table_name}.ancestry_string like ?", path_string + "%"]
+      ["#{table_name}.ancestry_string LIKE ?", path_string + "%"]
     end
 
     def subtree_conditions
       [
-        "#{table_name}.id = ? OR #{table_name}.ancestry_string like ?",
+        "#{table_name}.id = ? OR #{table_name}.ancestry_string LIKE ?",
         id, path_string + "%"
       ]
     end
