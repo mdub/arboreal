@@ -3,11 +3,6 @@ require 'spec'
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 
-require "rubygems"
-
-ENV["AR_VERSION"] ||= "~> 2.3.5"
-gem "activerecord", ENV["AR_VERSION"]
-
 require "active_record"
 require "logger"
 require "fileutils"

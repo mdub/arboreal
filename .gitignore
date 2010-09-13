@@ -3,3 +3,5 @@
 *.sqlite*
 doc
 tmp
+.bundle
+Gemfile.lock

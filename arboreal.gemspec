@@ -27,5 +27,4 @@ Gem::Specification.new do |s|
   s.files            = Dir["lib/**/*", "spec/**/*", "Rakefile"] + s.extra_rdoc_files
   s.add_runtime_dependency("activerecord", ">= 2.3.0")
   s.add_runtime_dependency("activesupport", ">= 2.3.0")
-  s.add_development_dependency("rspec", ">= 1.2.9")
 end
