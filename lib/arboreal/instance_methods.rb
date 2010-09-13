@@ -13,7 +13,7 @@ module Arboreal
     
     # return a scope matching all ancestors of this node
     def ancestors
-      model_base_class.scoped(:conditions => ancestor_conditions, :order => [:ancestry_string])
+      model_base_class.scoped(:conditions => ancestor_conditions, :order => :ancestry_string)
     end
 
     # return a scope matching all descendants of this node
