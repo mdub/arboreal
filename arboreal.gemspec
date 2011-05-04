@@ -8,11 +8,9 @@ Arboreal surfaces relationships within the tree like "children", "ancestors", "d
 as scopes, so that additional filtering/pagination can be performed.
 TEXT
 
-require 'lib/arboreal/version'
-
 Gem::Specification.new do |s|
   s.name             = "arboreal"
-  s.version          = Arboreal::VERSION.dup
+  s.version          = "0.1.1"
   s.platform         = Gem::Platform::RUBY
   s.required_ruby_version = ">= 1.8.7"
   s.summary          = "Efficient tree structures for ActiveRecord"

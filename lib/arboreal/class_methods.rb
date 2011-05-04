@@ -32,7 +32,7 @@ module Arboreal
     # As a result, this *may* not work for DBMS that aren't explicitly supported.
     #
     def ancestry_extension_sql
-      sql = if connection.adapter_name == "MySQL"
+      sql = if connection.adapter_name =~ /mysql/i
         <<-SQL
           UPDATE _arboreals_ AS child
           JOIN _arboreals_ AS parent ON parent.id = child.parent_id
