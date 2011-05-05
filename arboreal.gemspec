@@ -21,7 +21,6 @@ Gem::Specification.new do |s|
   s.author           = "Mike Williams"
   s.email            = "mdub@dogbiscuit.org"
   s.homepage         = "http://github.com/mdub/arboreal"
-  s.has_rdoc         = true
   s.extra_rdoc_files = ["README.rdoc", "LICENSE"]
   s.rdoc_options     = ["--title", "Arboreal", "--main", "README.rdoc"]
   s.require_path     = "lib"
