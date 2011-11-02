@@ -3,9 +3,9 @@ require 'spec_helper'
 require 'arboreal'
 
 class Node < ActiveRecord::Base
-  
+
   acts_arboreal
-  
+
   class Migration < ActiveRecord::Migration
 
     def self.up
@@ -22,7 +22,7 @@ class Node < ActiveRecord::Base
     end
 
   end
-  
+
 end
 
 describe "Arboreal hierarchy" do
@@ -30,7 +30,7 @@ describe "Arboreal hierarchy" do
   before(:all) do
     Node::Migration.up
   end
-  
+
   after(:all) do
     Node::Migration.down
   end
@@ -42,9 +42,9 @@ describe "Arboreal hierarchy" do
     @nsw = @australia.children.create!(:name => "New South Wales")
     @sydney = @nsw.children.create!(:name => "Sydney")
   end
-  
+
   describe "node" do
-  
+
     describe "#parent" do
       it "returns the parent" do
         @victoria.parent.should == @australia
@@ -62,7 +62,7 @@ describe "Arboreal hierarchy" do
         @victoria.siblings.should == [@nsw]
       end
     end
-    
+
     it "cannot be it's own parent" do
       lambda do
         @australia.update_attributes!(:parent => @australia)
@@ -76,9 +76,9 @@ describe "Arboreal hierarchy" do
     end
 
   end
-    
+
   describe "root node" do
-  
+
     describe "#parent" do
       it "returns nil" do
         @australia.parent.should == nil
@@ -90,7 +90,7 @@ describe "Arboreal hierarchy" do
         @australia.ancestors.should be_empty
       end
     end
-    
+
     describe "#ancestry_string" do
       it "is a single dash" do
         @australia.ancestry_string.should == "-"
@@ -140,15 +140,15 @@ describe "Arboreal hierarchy" do
     end
 
     describe "#root" do
-      
+
      it "is itself" do
        @australia.root.should == @australia
      end
-     
+
     end
-    
+
   end
-  
+
   describe "leaf node" do
 
     describe "#ancestry_string" do
@@ -164,11 +164,11 @@ describe "Arboreal hierarchy" do
     end
 
     describe "#ancestors" do
-      
+
       it "returns all ancestors, depth-first" do
         @melbourne.ancestors.all.should == [@australia, @victoria]
       end
-      
+
     end
 
     describe "#children" do
@@ -192,14 +192,14 @@ describe "Arboreal hierarchy" do
     end
 
   end
-  
+
   describe ".roots" do
-    
+
     it "returns root nodes" do
       @nz = Node.create!(:name => "New Zealand")
       Node.roots.to_set.should == [@australia, @nz].to_set
     end
-    
+
   end
 
   describe "when a node changes parent" do
@@ -209,9 +209,9 @@ describe "Arboreal hierarchy" do
       @nz = Node.create!(:name => "New Zealand")
       @victoria.update_attributes!(:parent => @nz)
     end
-    
+
     describe "each descendant" do
-      
+
       it "follows" do
 
         @melbourne.reload
@@ -223,30 +223,30 @@ describe "Arboreal hierarchy" do
         @box_hill.ancestors.should_not include(@australia)
 
       end
-      
+
     end
-    
+
   end
-  
+
   describe "node created using find_or_create_by" do
-    
+
     before do
       @tasmania = @australia.children.find_or_create_by_name("Tasmania")
     end
-    
+
     it "still has the right ancestry" do
       @tasmania.ancestors.should == [@australia]
     end
-    
+
   end
-  
+
   describe ".rebuild_ancestry" do
 
     before do
       Node.connection.update("UPDATE nodes SET ancestry_string = 'corrupt'")
       Node.rebuild_ancestry
     end
-    
+
     it "re-populates all ancestry_strings" do
       Node.count(:conditions => {:ancestry_string => 'corrupt'}).should == 0
     end
@@ -255,21 +255,21 @@ describe "Arboreal hierarchy" do
       @melbourne.reload.ancestors.should == [@australia, @victoria]
       @sydney.reload.ancestors.should == [@australia, @nsw]
     end
-    
+
   end
-  
+
 end
 
 class RedNode < Node; end
 class GreenNode < Node; end
 class BlueNode < Node; end
-  
+
 describe "polymorphic hierarchy" do
 
   before(:all) do
     Node::Migration.up
   end
-  
+
   after(:all) do
     Node::Migration.down
   end
@@ -279,7 +279,7 @@ describe "polymorphic hierarchy" do
     @green = GreenNode.create!(:parent => @red)
     @blue = BlueNode.create!(:parent => @green)
   end
-  
+
   describe "#descendants" do
     it "includes nodes of other types" do
       @red.descendants.should include(@green, @blue)
@@ -297,5 +297,5 @@ describe "polymorphic hierarchy" do
       @blue.ancestors.should include(@red, @green)
     end
   end
-  
+
 end

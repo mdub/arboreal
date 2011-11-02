@@ -39,14 +39,4 @@ DB_CONFIGS = {
 test_adapter = (ENV["AR_ADAPTER"] || "sqlite3")
 test_db_config = DB_CONFIGS[test_adapter].merge(:adapter => test_adapter)
 
-Spec::Runner.configure do |config|
-
-  config.before(:all) do
-    ActiveRecord::Base.establish_connection(test_db_config)
-  end
-
-  config.after(:all) do
-    ActiveRecord::Base.clear_active_connections!
-  end
-
-end
+ActiveRecord::Base.establish_connection(test_db_config)
