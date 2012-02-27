@@ -1,0 +1,9 @@
+language: ruby
+rvm:
+  - 1.8.7
+  - 1.9.3
+gemfile:
+  - gemfiles/activerecord-2.3
+  - gemfiles/activerecord-3.0
+  - gemfiles/activerecord-3.1
+  - gemfiles/activerecord-3.2
