@@ -1,25 +1,4 @@
-require 'spec_helper'
-
-require 'arboreal'
-
-class Node < ActiveRecord::Base
-  acts_arboreal
-
-  class Migration < ActiveRecord::Migration
-    def self.up
-      create_table "nodes", :force => true do |t|
-        t.string "name"
-        t.string "type"
-        t.integer "parent_id"
-        t.string "ancestry_string"
-      end
-    end
-
-    def self.down
-      drop_table "nodes"
-    end
-  end
-end
+require "spec_helper"
 
 describe "Arboreal hierarchy" do
   before(:each) do
@@ -128,9 +107,9 @@ describe "Arboreal hierarchy" do
     end
 
     describe "#root" do
-     it "is itself" do
-       @australia.root.should == @australia
-     end
+      it "is itself" do
+        @australia.root.should == @australia
+      end
     end
   end
 
@@ -222,44 +201,6 @@ describe "Arboreal hierarchy" do
     it "fixes the hierarchy" do
       @melbourne.reload.ancestors.should == [@australia, @victoria]
       @sydney.reload.ancestors.should == [@australia, @nsw]
-    end
-  end
-end
-
-class RedNode < Node; end
-class GreenNode < Node; end
-class BlueNode < Node; end
-
-describe "polymorphic hierarchy" do
-  before(:each) do
-    Node::Migration.up
-  end
-
-  after(:each) do
-    Node::Migration.down
-  end
-
-  before do
-    @red = RedNode.create!
-    @green = GreenNode.create!(:parent => @red)
-    @blue = BlueNode.create!(:parent => @green)
-  end
-
-  describe "#descendants" do
-    it "includes nodes of other types" do
-      @red.descendants.should include(@green, @blue)
-    end
-  end
-
-  describe "#subtree" do
-    it "includes nodes of other types" do
-      @red.subtree.should include(@red, @green, @blue)
-    end
-  end
-
-  describe "#ancestors" do
-    it "includes nodes of other types" do
-      @blue.ancestors.should include(@red, @green)
     end
   end
 end
