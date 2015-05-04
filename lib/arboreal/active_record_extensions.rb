@@ -11,12 +11,11 @@ module Arboreal
       include Arboreal::InstanceMethods
 
       before_validation :populate_ancestry_string
+      before_save :populate_ancestry_string
 
-      validate do |record|
-        record.send(:validate_parent_not_ancestor)
-      end
+      validate :validate_parent_not_ancestor
+      validates :ancestry_string, format: { with: /\A-(\d+-)*\z/, allow_nil: false, allow_blank: false }
 
-      before_save :detect_ancestry_change
       after_save  :apply_ancestry_change_to_descendants
 
       scope :roots, lambda { where(parent_id: nil) }

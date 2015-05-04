@@ -39,6 +39,33 @@ describe "Arboreal hierarchy" do
         @australia.update_attributes!(:parent => @melbourne)
       end.should raise_error(ActiveRecord::RecordInvalid)
     end
+
+    describe "ancestry string format" do
+      it "is valid" do
+        @australia.should be_valid
+      end
+
+      it "is not valid" do
+        @australia.ancestry_string = ''
+        @australia.should_not be_valid
+        @australia.ancestry_string = '42'
+        @australia.should_not be_valid
+        @australia.ancestry_string = '42-'
+        @australia.should_not be_valid
+        @australia.ancestry_string = '--'
+        @australia.should_not be_valid
+        @australia.ancestry_string = '-42'
+        @australia.should_not be_valid
+        @australia.ancestry_string = '-42-58'
+        @australia.should_not be_valid
+        @australia.ancestry_string = 'not ids'
+        @australia.should_not be_valid
+        @australia.ancestry_string = '\''
+        @australia.should_not be_valid
+        @australia.ancestry_string = '; drop table nodes'
+        @australia.should_not be_valid
+      end
+    end
   end
 
   describe "root node" do
@@ -177,6 +204,18 @@ describe "Arboreal hierarchy" do
 
     it "still has the right ancestry" do
       @tasmania.ancestors.should == [@australia]
+    end
+  end
+
+  describe "SQL injection protection" do
+    before do
+      @melbourne.ancestry_string = 'EVIL \'"SQL INJECTION'
+    end
+
+    it 'does not cause a SQL injection' do
+      lambda {
+        @melbourne.save(validate: false)
+      }.should_not raise_error
     end
   end
 
