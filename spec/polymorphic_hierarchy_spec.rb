@@ -1,14 +1,6 @@
 require 'spec_helper'
 
 describe "polymorphic hierarchy" do
-  before(:each) do
-    Node::Migration.up
-  end
-
-  after(:each) do
-    Node::Migration.down
-  end
-
   before do
     @red = RedNode.create!
     @green = GreenNode.create!(:parent => @red)

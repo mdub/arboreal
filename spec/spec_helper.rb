@@ -12,3 +12,13 @@ ActiveRecord::Base.logger.level = Logger::DEBUG
 require_relative "support/db"
 require "arboreal"
 require_relative "support/node"
+
+RSpec.configure do |c|
+  c.before(:each) do
+    Node::Migration.up
+  end
+
+  c.after(:each) do
+    Node::Migration.down
+  end
+end
