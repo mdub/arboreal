@@ -4,16 +4,16 @@ module Arboreal
   module InstanceMethods
 
     def path_string
-      "#{ancestry_string}#{id}-"
+      "#{materialized_path}#{id}-"
     end
 
     def ancestor_ids
-      ancestry_string.sub(/^-/, "").split("-").map { |x| x.to_i }
+      materialized_path.sub(/^-/, "").split("-").map { |x| x.to_i }
     end
 
     # return a scope matching all ancestors of this node
     def ancestors
-      model_base_class.scoped(:conditions => ancestor_conditions, :order => :ancestry_string)
+      model_base_class.scoped(:conditions => ancestor_conditions, :order => :materialized_path)
     end
 
     # return a scope matching all descendants of this node
@@ -51,12 +51,12 @@ module Arboreal
     end
 
     def descendant_conditions
-      ["#{table_name}.ancestry_string LIKE ?", path_string + "%"]
+      ["#{table_name}.materialized_path LIKE ?", path_string + "%"]
     end
 
     def subtree_conditions
       [
-        "#{table_name}.id = ? OR #{table_name}.ancestry_string LIKE ?",
+        "#{table_name}.id = ? OR #{table_name}.materialized_path LIKE ?",
         id, path_string + "%"
       ]
     end
@@ -68,10 +68,10 @@ module Arboreal
       ]
     end
 
-    def populate_ancestry_string
-      self.ancestry_string = nil if parent_id_changed?
+    def populate_materialized_path
+      self.materialized_path = nil if parent_id_changed?
       model_base_class.send(:with_exclusive_scope) do
-        self.ancestry_string ||= parent ? parent.path_string : "-"
+        self.materialized_path ||= parent ? parent.path_string : "-"
       end
     end
 
@@ -87,11 +87,11 @@ module Arboreal
     end
 
     def apply_ancestry_change_to_descendants
-      if ancestry_string_changed? && persisted?
-        old_path_string = "#{ancestry_string_was}#{id}-"
+      if materialized_path_changed? && persisted?
+        old_path_string = "#{materialized_path_was}#{id}-"
         self.class
-          .where("ancestry_string like ?", old_path_string + "%")
-          .update_all ["ancestry_string = REPLACE(ancestry_string, ?, ?)", old_path_string, path_string]
+          .where("materialized_path like ?", old_path_string + "%")
+          .update_all ["materialized_path = REPLACE(materialized_path, ?, ?)", old_path_string, path_string]
       end
     end
   end

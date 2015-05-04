@@ -46,23 +46,23 @@ describe "Arboreal hierarchy" do
       end
 
       it "is not valid" do
-        @australia.ancestry_string = ''
+        @australia.materialized_path = ''
         @australia.should_not be_valid
-        @australia.ancestry_string = '42'
+        @australia.materialized_path = '42'
         @australia.should_not be_valid
-        @australia.ancestry_string = '42-'
+        @australia.materialized_path = '42-'
         @australia.should_not be_valid
-        @australia.ancestry_string = '--'
+        @australia.materialized_path = '--'
         @australia.should_not be_valid
-        @australia.ancestry_string = '-42'
+        @australia.materialized_path = '-42'
         @australia.should_not be_valid
-        @australia.ancestry_string = '-42-58'
+        @australia.materialized_path = '-42-58'
         @australia.should_not be_valid
-        @australia.ancestry_string = 'not ids'
+        @australia.materialized_path = 'not ids'
         @australia.should_not be_valid
-        @australia.ancestry_string = '\''
+        @australia.materialized_path = '\''
         @australia.should_not be_valid
-        @australia.ancestry_string = '; drop table nodes'
+        @australia.materialized_path = '; drop table nodes'
         @australia.should_not be_valid
       end
     end
@@ -81,9 +81,9 @@ describe "Arboreal hierarchy" do
       end
     end
 
-    describe "#ancestry_string" do
+    describe "#materialized_path" do
       it "is a single dash" do
-        @australia.ancestry_string.should == "-"
+        @australia.materialized_path.should == "-"
       end
     end
 
@@ -133,9 +133,9 @@ describe "Arboreal hierarchy" do
   end
 
   describe "leaf node" do
-    describe "#ancestry_string" do
+    describe "#materialized_path" do
       it "contains ids of all ancestors" do
-        @melbourne.ancestry_string.should == "-#{@australia.id}-#{@victoria.id}-"
+        @melbourne.materialized_path.should == "-#{@australia.id}-#{@victoria.id}-"
       end
     end
 
@@ -209,7 +209,7 @@ describe "Arboreal hierarchy" do
 
   describe "SQL injection protection" do
     before do
-      @melbourne.ancestry_string = 'EVIL \'"SQL INJECTION'
+      @melbourne.materialized_path = 'EVIL \'"SQL INJECTION'
     end
 
     it 'does not cause a SQL injection' do
@@ -221,12 +221,12 @@ describe "Arboreal hierarchy" do
 
   describe ".rebuild_ancestry" do
     before do
-      Node.connection.update("UPDATE nodes SET ancestry_string = 'corrupt'")
+      Node.connection.update("UPDATE nodes SET materialized_path = 'corrupt'")
       Node.rebuild_ancestry
     end
 
-    it "re-populates all ancestry_strings" do
-      Node.count(:conditions => {:ancestry_string => 'corrupt'}).should == 0
+    it "re-populates all materialized_paths" do
+      Node.count(:conditions => {:materialized_path => 'corrupt'}).should == 0
     end
 
     it "fixes the hierarchy" do

@@ -9,7 +9,7 @@ class Node < ActiveRecord::Base
         t.string "name"
         t.string "type"
         t.integer "parent_id"
-        t.string "ancestry_string"
+        t.string "materialized_path"
       end
     end
 

@@ -18,20 +18,20 @@ It delegates as much work as possible to the underlying DBMS, making it efficien
 
 First, install the "arboreal" gem, and add it to your Rails project's <tt>config/environment.rb</tt>.  
 
-Next, you'll need a migration to add +parent_id+ and +ancestry_string+ columns, and indices:
+Next, you'll need a migration to add +parent_id+ and +materialized_path+ columns, and indices:
 
     class MakeThingsArboreal < ActiveRecord::Migration
 
       def self.up
         add_column "things", "parent_id", :integer
         add_index "things", ["parent_id"]
-        add_column "things", "ancestry_string", :string
-        add_index "things", ["ancestry_string"]
+        add_column "things", "materialized_path", :string
+        add_index "things", ["materialized_path"]
       end
 
       def self.down
-        remove_index "things", ["ancestry_string"]
-        remove_column "things", "ancestry_string"
+        remove_index "things", ["materialized_path"]
+        remove_column "things", "materialized_path"
         remove_index "things", ["parent_id"]
         remove_column "things", "parent_id"
       end
@@ -72,7 +72,7 @@ At the class-level:
 
 == Rebuilding the ancestry cache
  
-Internally, Arboreal uses the +ancestry_string+ column to cache the path down the tree to each node (or more correctly, it's parent.  This technique - a variant of "path enumeration" or "materialized paths" - allows efficient retrieval of both ancestors and descendants.
+Internally, Arboreal uses the +materialized_path+ column to cache the path down the tree to each node (or more correctly, it's parent.  This technique - a variant of "path enumeration" or "materialized paths" - allows efficient retrieval of both ancestors and descendants.
 
 It's conceivable that the computed ancestry-string values may get out of whack, particularly if changes are made directly to the database.  If you suspect corruption, you can restore sanity using <tt>rebuild_ancestry</tt>, e.g
 
