@@ -92,7 +92,7 @@ module Arboreal
     end
 
     def apply_ancestry_change_to_descendants
-      if materialized_path_changed? && persisted?
+      if materialized_path_changed?
         old_path_string = "#{materialized_path_was}#{id}-"
         self.class
           .where("materialized_path like ?", old_path_string + "%")

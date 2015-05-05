@@ -17,7 +17,7 @@ module Arboreal
       validate :validate_parent_not_ancestor
       validates :materialized_path, format: { with: /\A-(\d+-)*\z/, allow_nil: false, allow_blank: false }
 
-      after_save :apply_ancestry_change_to_descendants
+      after_update :apply_ancestry_change_to_descendants
 
       scope :roots, lambda { where(parent_id: nil) }
     end
