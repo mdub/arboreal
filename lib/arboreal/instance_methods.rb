@@ -4,7 +4,11 @@ module Arboreal
   module InstanceMethods
 
     def path_string
-      "#{materialized_path}#{id}-"
+      if new_record?
+        nil
+      else
+        "#{materialized_path}#{id}-"
+      end
     end
 
     def ancestor_ids
@@ -69,9 +73,10 @@ module Arboreal
     end
 
     def populate_materialized_path
-      self.materialized_path = nil if parent_id_changed?
-      model_base_class.send(:with_exclusive_scope) do
-        self.materialized_path ||= parent ? parent.path_string : "-"
+      if parent_id_changed? || materialized_path.nil?
+        model_base_class.send(:with_exclusive_scope) do
+          self.materialized_path = parent ? parent.path_string : "-"
+        end
       end
     end
 
