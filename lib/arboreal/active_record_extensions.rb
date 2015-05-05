@@ -15,7 +15,7 @@ module Arboreal
       before_save :populate_materialized_path
 
       validate :validate_parent_not_ancestor
-      validates :materialized_path, format: { with: /\A-(\d+-)*\z/, allow_nil: true, allow_blank: false }
+      validates :materialized_path, format: { with: /\A-(\d+-)*\z/, allow_nil: false, allow_blank: false }
 
       after_save :apply_ancestry_change_to_descendants
 
