@@ -5,7 +5,7 @@ module Arboreal
 
     def path_string
       if new_record?
-        nil
+        "-"
       else
         "#{materialized_path}#{id}-"
       end
@@ -82,7 +82,7 @@ module Arboreal
 
     def validate_parent_not_ancestor
       if self.id
-        if parent_id == self.id
+        if parent == self
           errors.add(:parent, "can't be the record itself")
         end
         if ancestor_ids.include?(self.id)

@@ -92,8 +92,8 @@ describe "Arboreal hierarchy" do
         @australia.path_string.should == "-#{@australia.id}-"
       end
 
-      it "returns nil for new records" do
-        Node.new.path_string.should be_nil
+      it "returns '-' for new records" do
+        Node.new.path_string.should == "-"
       end
     end
 
