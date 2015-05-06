@@ -201,6 +201,20 @@ describe "Arboreal hierarchy" do
     end
   end
 
+  describe "when a node becomes a root" do
+    before do
+      @victoria.update_attribute(:parent_id, nil)
+    end
+
+    it "no longer has ancestors" do
+      @victoria.ancestors.should be_empty
+    end
+
+    it "persists changes to the ancestors" do
+      @victoria.reload.ancestors.should be_empty
+    end
+  end
+
   describe "node created using find_or_create_by" do
     before do
       @tasmania = @australia.children.find_or_create_by_name("Tasmania")

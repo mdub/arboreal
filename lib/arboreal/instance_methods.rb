@@ -81,11 +81,11 @@ module Arboreal
     end
 
     def validate_parent_not_ancestor
-      if self.id
+      if persisted?
         if parent == self
           errors.add(:parent, "can't be the record itself")
         end
-        if ancestor_ids.include?(self.id)
+        if ancestor_ids.include?(id)
           errors.add(:parent, "can't be an ancestor")
         end
       end
