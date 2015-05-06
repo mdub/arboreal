@@ -1,3 +1,0 @@
-ENV["AR_VERSION"] = "~> 3.0.11"
-
-eval(File.read(File.expand_path("../../Gemfile", __FILE__)))
