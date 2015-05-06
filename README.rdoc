@@ -48,6 +48,16 @@ Finally, you can declare your model arboreal:
       
     end
 
+If you want to customize the +parent+ and/or +children+ relations, you can pass additional relation options to +acts_arboreal+:
+
+    class Thing < ActiveRecord::Base
+
+      acts_arboreal parent_relation_options: { touch: true }, children_relation_options: { autosave: true }
+
+      # .. etc etc ...
+
+    end
+
 == Navigating the tree
 
 Arboreal adds the basic relationships you'd expect:
