@@ -35,6 +35,11 @@ module Arboreal
       model_base_class.scoped(:conditions => sibling_conditions)
     end
 
+    # return whether or not this is a root of the tree
+    def root?
+      parent_id.nil?
+    end
+
     # return the root of the tree
     def root
       ancestors.first || self

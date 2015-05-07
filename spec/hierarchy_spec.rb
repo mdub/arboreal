@@ -69,6 +69,10 @@ describe "Arboreal hierarchy" do
   end
 
   describe "root node" do
+    it "is a root" do
+      @australia.should be_root
+    end
+
     describe "#parent" do
       it "returns nil" do
         @australia.parent.should == nil
@@ -137,6 +141,10 @@ describe "Arboreal hierarchy" do
   end
 
   describe "leaf node" do
+    it "is not a root" do
+      @melbourne.should_not be_root
+    end
+
     describe "#materialized_path" do
       it "contains ids of all ancestors" do
         @melbourne.materialized_path.should == "-#{@australia.id}-#{@victoria.id}-"
