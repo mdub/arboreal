@@ -12,7 +12,7 @@ module Arboreal
     end
 
     def ancestor_ids
-      materialized_path.sub(/^-/, "").split("-").map { |x| x.to_i }
+      materialized_path.to_s.sub(/^-/, "").split("-").map { |x| x.to_i }
     end
 
     # return a scope matching all ancestors of this node

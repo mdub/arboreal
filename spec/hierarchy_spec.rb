@@ -252,4 +252,12 @@ describe "Arboreal hierarchy" do
       @sydney.reload.ancestors.should == [@australia, @nsw]
     end
   end
+
+  describe "a newly-created node" do
+    let(:new_node) { Node.new(name: "New node") }
+
+    it "has no ancestor ids" do
+      new_node.ancestor_ids.should be_empty
+    end
+  end
 end
