@@ -25,6 +25,6 @@ Gem::Specification.new do |s|
   s.rdoc_options     = ["--title", "Arboreal", "--main", "README.rdoc"]
   s.require_path     = "lib"
   s.files            = Dir["lib/**/*", "spec/**/*", "Rakefile"] + s.extra_rdoc_files
-  s.add_runtime_dependency("activerecord", "~> 3.0")
-  s.add_runtime_dependency("activesupport", "~> 3.0")
+  s.add_runtime_dependency("activerecord", "~> 3.1")
+  s.add_runtime_dependency("activesupport", "~> 3.1")
 end
