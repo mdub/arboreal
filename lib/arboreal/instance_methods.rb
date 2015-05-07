@@ -42,7 +42,7 @@ module Arboreal
 
     # return the root of the tree
     def root
-      ancestors.first || self
+      root? ? self : ancestors.first
     end
 
     private
