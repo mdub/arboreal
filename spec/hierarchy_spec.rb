@@ -1,40 +1,6 @@
-require 'spec_helper'
-
-require 'arboreal'
-
-class Node < ActiveRecord::Base
-
-  acts_arboreal
-
-  class Migration < ActiveRecord::Migration
-
-    def self.up
-      create_table "nodes", :force => true do |t|
-        t.string "name"
-        t.string "type"
-        t.integer "parent_id"
-        t.string "ancestry_string"
-      end
-    end
-
-    def self.down
-      drop_table "nodes"
-    end
-
-  end
-
-end
+require "spec_helper"
 
 describe "Arboreal hierarchy" do
-
-  before(:all) do
-    Node::Migration.up
-  end
-
-  after(:all) do
-    Node::Migration.down
-  end
-
   before do
     @australia = Node.create!(:name => "Australia")
     @victoria = @australia.children.create!(:name => "Victoria")
@@ -44,7 +10,6 @@ describe "Arboreal hierarchy" do
   end
 
   describe "node" do
-
     describe "#parent" do
       it "returns the parent" do
         @victoria.parent.should == @australia
@@ -75,9 +40,38 @@ describe "Arboreal hierarchy" do
       end.should raise_error(ActiveRecord::RecordInvalid)
     end
 
+    describe "ancestry string format" do
+      it "is valid" do
+        @australia.should be_valid
+      end
+
+      it "is not valid" do
+        @australia.materialized_path = ''
+        @australia.should_not be_valid
+        @australia.materialized_path = '42'
+        @australia.should_not be_valid
+        @australia.materialized_path = '42-'
+        @australia.should_not be_valid
+        @australia.materialized_path = '--'
+        @australia.should_not be_valid
+        @australia.materialized_path = '-42'
+        @australia.should_not be_valid
+        @australia.materialized_path = '-42-58'
+        @australia.should_not be_valid
+        @australia.materialized_path = 'not ids'
+        @australia.should_not be_valid
+        @australia.materialized_path = '\''
+        @australia.should_not be_valid
+        @australia.materialized_path = '; drop table nodes'
+        @australia.should_not be_valid
+      end
+    end
   end
 
   describe "root node" do
+    it "is a root" do
+      @australia.should be_root
+    end
 
     describe "#parent" do
       it "returns nil" do
@@ -91,9 +85,9 @@ describe "Arboreal hierarchy" do
       end
     end
 
-    describe "#ancestry_string" do
+    describe "#materialized_path" do
       it "is a single dash" do
-        @australia.ancestry_string.should == "-"
+        @australia.materialized_path.should == "-"
       end
     end
 
@@ -101,10 +95,13 @@ describe "Arboreal hierarchy" do
       it "contains only the id of the root" do
         @australia.path_string.should == "-#{@australia.id}-"
       end
+
+      it "returns '-' for new records" do
+        Node.new.path_string.should == "-"
+      end
     end
 
     describe "#descendants" do
-
       it "includes children" do
         @australia.descendants.should include(@victoria)
         @australia.descendants.should include(@nsw)
@@ -118,11 +115,9 @@ describe "Arboreal hierarchy" do
       it "excludes self" do
         @australia.descendants.should_not include(@australia)
       end
-
     end
 
     describe "#subtree" do
-
       it "includes children" do
         @australia.subtree.should include(@victoria)
         @australia.subtree.should include(@nsw)
@@ -136,24 +131,23 @@ describe "Arboreal hierarchy" do
       it "includes self" do
         @australia.subtree.should include(@australia)
       end
-
     end
 
     describe "#root" do
-
-     it "is itself" do
-       @australia.root.should == @australia
-     end
-
+      it "is itself" do
+        @australia.root.should == @australia
+      end
     end
-
   end
 
   describe "leaf node" do
+    it "is not a root" do
+      @melbourne.should_not be_root
+    end
 
-    describe "#ancestry_string" do
+    describe "#materialized_path" do
       it "contains ids of all ancestors" do
-        @melbourne.ancestry_string.should == "-#{@australia.id}-#{@victoria.id}-"
+        @melbourne.materialized_path.should == "-#{@australia.id}-#{@victoria.id}-"
       end
     end
 
@@ -164,11 +158,9 @@ describe "Arboreal hierarchy" do
     end
 
     describe "#ancestors" do
-
       it "returns all ancestors, depth-first" do
         @melbourne.ancestors.all.should == [@australia, @victoria]
       end
-
     end
 
     describe "#children" do
@@ -184,26 +176,20 @@ describe "Arboreal hierarchy" do
     end
 
     describe "#root" do
-
       it "is the root of the tree" do
         @melbourne.root.should == @australia
       end
-
     end
-
   end
 
   describe ".roots" do
-
     it "returns root nodes" do
       @nz = Node.create!(:name => "New Zealand")
       Node.roots.to_set.should == [@australia, @nz].to_set
     end
-
   end
 
   describe "when a node changes parent" do
-
     before do
       @box_hill = Node.create!(:name => "Box Hill", :parent => @melbourne)
       @nz = Node.create!(:name => "New Zealand")
@@ -211,9 +197,7 @@ describe "Arboreal hierarchy" do
     end
 
     describe "each descendant" do
-
       it "follows" do
-
         @melbourne.reload
         @melbourne.ancestors.should include(@nz, @victoria)
         @melbourne.ancestors.should_not include(@australia)
@@ -221,15 +205,25 @@ describe "Arboreal hierarchy" do
         @box_hill.reload
         @box_hill.ancestors.should include(@nz, @victoria, @melbourne)
         @box_hill.ancestors.should_not include(@australia)
-
       end
+    end
+  end
 
+  describe "when a node becomes a root" do
+    before do
+      @victoria.update_attribute(:parent_id, nil)
     end
 
+    it "no longer has ancestors" do
+      @victoria.ancestors.should be_empty
+    end
+
+    it "persists changes to the ancestors" do
+      @victoria.reload.ancestors.should be_empty
+    end
   end
 
   describe "node created using find_or_create_by" do
-
     before do
       @tasmania = @australia.children.find_or_create_by_name("Tasmania")
     end
@@ -237,65 +231,41 @@ describe "Arboreal hierarchy" do
     it "still has the right ancestry" do
       @tasmania.ancestors.should == [@australia]
     end
+  end
 
+  describe "SQL injection protection" do
+    before do
+      @melbourne.materialized_path = 'EVIL \'"SQL INJECTION'
+    end
+
+    it 'does not cause a SQL injection' do
+      lambda {
+        @melbourne.save(validate: false)
+      }.should_not raise_error
+    end
   end
 
   describe ".rebuild_ancestry" do
-
     before do
-      Node.connection.update("UPDATE nodes SET ancestry_string = 'corrupt'")
+      Node.connection.update("UPDATE nodes SET materialized_path = 'corrupt'")
       Node.rebuild_ancestry
     end
 
-    it "re-populates all ancestry_strings" do
-      Node.count(:conditions => {:ancestry_string => 'corrupt'}).should == 0
+    it "re-populates all materialized_paths" do
+      Node.count(:conditions => {:materialized_path => 'corrupt'}).should == 0
     end
 
     it "fixes the hierarchy" do
       @melbourne.reload.ancestors.should == [@australia, @victoria]
       @sydney.reload.ancestors.should == [@australia, @nsw]
     end
-
   end
 
-end
+  describe "a newly-created node" do
+    let(:new_node) { Node.new(name: "New node") }
 
-class RedNode < Node; end
-class GreenNode < Node; end
-class BlueNode < Node; end
-
-describe "polymorphic hierarchy" do
-
-  before(:all) do
-    Node::Migration.up
-  end
-
-  after(:all) do
-    Node::Migration.down
-  end
-
-  before do
-    @red = RedNode.create!
-    @green = GreenNode.create!(:parent => @red)
-    @blue = BlueNode.create!(:parent => @green)
-  end
-
-  describe "#descendants" do
-    it "includes nodes of other types" do
-      @red.descendants.should include(@green, @blue)
+    it "has no ancestor ids" do
+      new_node.ancestor_ids.should be_empty
     end
   end
-
-  describe "#subtree" do
-    it "includes nodes of other types" do
-      @red.subtree.should include(@red, @green, @blue)
-    end
-  end
-
-  describe "#ancestors" do
-    it "includes nodes of other types" do
-      @blue.ancestors.should include(@red, @green)
-    end
-  end
-
 end

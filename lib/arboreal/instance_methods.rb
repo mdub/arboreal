@@ -4,16 +4,20 @@ module Arboreal
   module InstanceMethods
 
     def path_string
-      "#{ancestry_string}#{id}-"
+      if new_record?
+        "-"
+      else
+        "#{materialized_path}#{id}-"
+      end
     end
 
     def ancestor_ids
-      ancestry_string.sub(/^-/, "").split("-").map { |x| x.to_i }
+      materialized_path.to_s.sub(/^-/, "").split("-").map { |x| x.to_i }
     end
 
     # return a scope matching all ancestors of this node
     def ancestors
-      model_base_class.scoped(:conditions => ancestor_conditions, :order => :ancestry_string)
+      model_base_class.scoped(:conditions => ancestor_conditions, :order => :materialized_path)
     end
 
     # return a scope matching all descendants of this node
@@ -31,9 +35,14 @@ module Arboreal
       model_base_class.scoped(:conditions => sibling_conditions)
     end
 
+    # return whether or not this is a root of the tree
+    def root?
+      parent_id.nil?
+    end
+
     # return the root of the tree
     def root
-      ancestors.first || self
+      root? ? self : ancestors.first
     end
 
     private
@@ -51,12 +60,12 @@ module Arboreal
     end
 
     def descendant_conditions
-      ["#{table_name}.ancestry_string LIKE ?", path_string + "%"]
+      ["#{table_name}.materialized_path LIKE ?", path_string + "%"]
     end
 
     def subtree_conditions
       [
-        "#{table_name}.id = ? OR #{table_name}.ancestry_string LIKE ?",
+        "#{table_name}.id = ? OR #{table_name}.materialized_path LIKE ?",
         id, path_string + "%"
       ]
     end
@@ -68,42 +77,32 @@ module Arboreal
       ]
     end
 
-    def populate_ancestry_string
-      self.ancestry_string = nil if parent_id_changed?
-      model_base_class.send(:with_exclusive_scope) do
-        self.ancestry_string ||= parent ? parent.path_string : "-"
+    def populate_materialized_path
+      if parent_id_changed? || materialized_path.nil?
+        model_base_class.send(:with_exclusive_scope) do
+          self.materialized_path = parent ? parent.path_string : "-"
+        end
       end
     end
 
     def validate_parent_not_ancestor
-      if self.id
-        if parent_id == self.id
+      if persisted?
+        if parent == self
           errors.add(:parent, "can't be the record itself")
         end
-        if ancestor_ids.include?(self.id)
+        if ancestor_ids.include?(id)
           errors.add(:parent, "can't be an ancestor")
         end
       end
     end
 
-    def detect_ancestry_change
-      if ancestry_string_changed? && !new_record?
-        old_path_string = "#{ancestry_string_was}#{id}-"
-        @ancestry_change = [old_path_string, path_string]
-      end
-    end
-
     def apply_ancestry_change_to_descendants
-      if @ancestry_change
-        old_ancestry_string, new_ancestry_string = *@ancestry_change
-        connection.update(<<-SQL.squish)
-          UPDATE #{table_name}
-            SET ancestry_string = REPLACE(ancestry_string, '#{old_ancestry_string}', '#{new_ancestry_string}')
-            WHERE ancestry_string LIKE '#{old_ancestry_string}%'
-        SQL
-        @ancestry_change = nil
+      if materialized_path_changed?
+        old_path_string = "#{materialized_path_was}#{id}-"
+        self.class
+          .where("materialized_path like ?", old_path_string + "%")
+          .update_all ["materialized_path = REPLACE(materialized_path, ?, ?)", old_path_string, path_string]
       end
     end
-
   end
 end

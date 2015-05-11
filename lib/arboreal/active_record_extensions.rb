@@ -2,39 +2,25 @@ require 'active_record'
 
 module Arboreal
   module ActiveRecordExtensions
-
     # Declares that this ActiveRecord::Base model has a tree-like structure.
-    def acts_arboreal
-
-      belongs_to :parent, :class_name => self.name
-      has_many   :children, :class_name => self.name, :foreign_key => :parent_id
+    def acts_arboreal(options = {})
+      belongs_to :parent, { class_name: self.name, inverse_of: :children }.merge(options[:parent_relation_options] || {})
+      has_many   :children, { class_name: self.name, foreign_key: :parent_id, inverse_of: :parent }
+                              .merge(options[:children_relation_options] || {})
 
       extend Arboreal::ClassMethods
       include Arboreal::InstanceMethods
 
-      before_validation :populate_ancestry_string
+      before_validation :populate_materialized_path
+      before_save :populate_materialized_path
 
-      validate do |record|
-        record.send(:validate_parent_not_ancestor)
-      end
+      validate :validate_parent_not_ancestor
+      validates :materialized_path, format: { with: /\A-(\d+-)*\z/, allow_nil: false, allow_blank: false }
 
-      before_save :detect_ancestry_change
-      after_save  :apply_ancestry_change_to_descendants
+      after_update :apply_ancestry_change_to_descendants
 
-      case ActiveRecord::VERSION::MAJOR
-
-      when 3
-        scope :roots, where(:parent_id => nil)
-
-      when 2
-        named_scope :roots, {
-          :conditions => ["parent_id IS NULL"]
-        }
-
-      end
-
+      scope :roots, lambda { where(parent_id: nil) }
     end
-
   end
 end
 

@@ -1,7 +1,7 @@
 description = <<TEXT
 Arboreal is yet another extension to ActiveRecord to support tree-shaped data structures.
 
-Internally, Arboreal maintains a computed "ancestry_string" column, which caches the path from the root of
+Internally, Arboreal maintains a computed "materialized_path" column, which caches the path from the root of
 a tree to each node, allowing efficient retrieval of both ancestors and descendants.
 
 Arboreal surfaces relationships within the tree like "children", "ancestors", "descendants", and "siblings"
@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
   s.name             = "arboreal"
   s.version          = Arboreal::VERSION.dup
   s.platform         = Gem::Platform::RUBY
-  s.required_ruby_version = ">= 1.8.7"
+  s.required_ruby_version = ">= 1.9.3"
   s.summary          = "Efficient tree structures for ActiveRecord"
   s.description      = description
   s.author           = "Mike Williams"
@@ -25,6 +25,6 @@ Gem::Specification.new do |s|
   s.rdoc_options     = ["--title", "Arboreal", "--main", "README.rdoc"]
   s.require_path     = "lib"
   s.files            = Dir["lib/**/*", "spec/**/*", "Rakefile"] + s.extra_rdoc_files
-  s.add_runtime_dependency("activerecord", ">= 2.3.0")
-  s.add_runtime_dependency("activesupport", ">= 2.3.0")
+  s.add_runtime_dependency("activerecord", "~> 3.1")
+  s.add_runtime_dependency("activesupport", "~> 3.1")
 end
