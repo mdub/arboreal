@@ -45,6 +45,10 @@ module Arboreal
       root? ? self : ancestors.first
     end
 
+    def ancestry_depth
+      ancestor_ids.size
+    end
+
     private
 
     def model_base_class
