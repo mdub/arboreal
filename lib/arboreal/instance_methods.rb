@@ -79,9 +79,7 @@ module Arboreal
 
     def populate_materialized_path
       if parent_id_changed? || materialized_path.nil?
-        model_base_class.send(:with_exclusive_scope) do
-          self.materialized_path = parent ? parent.path_string : "-"
-        end
+        self.materialized_path = parent ? parent.path_string : "-"
       end
     end
 
