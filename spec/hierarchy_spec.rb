@@ -225,7 +225,11 @@ describe "Arboreal hierarchy" do
 
   describe "node created using find_or_create_by" do
     before do
-      @tasmania = @australia.children.find_or_create_by_name("Tasmania")
+      if Gem.loaded_specs['activerecord'].version >= Gem::Version.create('4.0')
+        @tasmania = @australia.children.find_or_create_by(name: "Tasmania")
+      else
+        @tasmania = @australia.children.find_or_create_by_name("Tasmania")
+      end
     end
 
     it "still has the right ancestry" do

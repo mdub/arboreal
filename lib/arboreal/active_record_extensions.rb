@@ -4,8 +4,8 @@ module Arboreal
   module ActiveRecordExtensions
     # Declares that this ActiveRecord::Base model has a tree-like structure.
     def acts_arboreal(options = {})
-      belongs_to :parent, { class_name: self.name, inverse_of: :children }.merge(options[:parent_relation_options] || {})
-      has_many   :children, { class_name: self.name, foreign_key: :parent_id, inverse_of: :parent }
+      belongs_to :parent, { class_name: self.name }.merge(options[:parent_relation_options] || {})
+      has_many   :children, { class_name: self.name, foreign_key: :parent_id }
                               .merge(options[:children_relation_options] || {})
 
       extend Arboreal::ClassMethods
