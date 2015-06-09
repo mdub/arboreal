@@ -79,7 +79,7 @@ module Arboreal
 
     def populate_materialized_path
       if parent_id_changed? || materialized_path.nil?
-        self.materialized_path = parent_id ? parent.path_string : "-"
+        self.materialized_path = (parent_id && parent) ? parent.path_string : "-"
       end
     end
 
