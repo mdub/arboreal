@@ -40,6 +40,17 @@ describe "Arboreal hierarchy" do
       end.should raise_error(ActiveRecord::RecordInvalid)
     end
 
+    describe "#ancestry_depth" do
+      specify "root nodes are at depth 0" do
+        @australia.ancestry_depth.should == 0
+      end
+
+      specify "child nodes are one level deeper than their parents" do
+        @victoria.ancestry_depth.should == 1
+        @melbourne.ancestry_depth.should == 2
+      end
+    end
+
     describe "ancestry string format" do
       it "is valid" do
         @australia.should be_valid
