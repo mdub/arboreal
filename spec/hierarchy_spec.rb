@@ -257,18 +257,46 @@ describe "Arboreal hierarchy" do
   end
 
   describe ".rebuild_ancestry" do
-    before do
-      Node.connection.update("UPDATE nodes SET materialized_path = 'corrupt'")
-      Node.rebuild_ancestry
+    context "when root relation is enabled" do
+      before do
+        Node.connection.update("UPDATE nodes SET materialized_path = 'corrupt', root_ancestor_id = 0")
+        Node.rebuild_ancestry
+      end
+
+      it "re-populates the `foreign_key` for the `root_ancestor` relation" do
+        @australia.reload.root_ancestor_id.should be_nil
+        @melbourne.reload.root_ancestor_id.should == @australia.id
+        @victoria.reload.root_ancestor_id.should == @australia.id
+      end
+
+      it "re-populates all materialized_paths" do
+        Node.count(:conditions => {:materialized_path => 'corrupt'}).should == 0
+      end
+
+      it "fixes the hierarchy" do
+        @melbourne.reload.ancestors.should == [@australia, @victoria]
+        @sydney.reload.ancestors.should == [@australia, @nsw]
+      end
     end
 
-    it "re-populates all materialized_paths" do
-      Node.count(:conditions => {:materialized_path => 'corrupt'}).should == 0
-    end
+    context "when root relation is disabled" do
+      before do
+        @grandparent = Branch.create!(name: "Root")
+        @child       = @grandparent.children.create!(name: "Child")
+        @grandchild  = @child.children.create!(name: "Grandchild")
 
-    it "fixes the hierarchy" do
-      @melbourne.reload.ancestors.should == [@australia, @victoria]
-      @sydney.reload.ancestors.should == [@australia, @nsw]
+        Branch.connection.update("UPDATE nodes SET materialized_path = 'corrupt'")
+        Branch.rebuild_ancestry
+      end
+
+      it "re-populates all materialized_paths" do
+        Branch.where(materialized_path: 'corrupt').should have(0).items
+      end
+
+      it "fixes the hierarchy" do
+        @child.reload.ancestors.should == [@grandparent]
+        @grandchild.reload.ancestors.should == [@grandparent, @child]
+      end
     end
   end
 

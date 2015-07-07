@@ -10,6 +10,7 @@ module Arboreal
       begin
         n_changes = extend_materialized_paths
       end until n_changes.zero?
+      populate_root_relation if reflect_on_association(:root_ancestor)
     end
     
     private
@@ -20,6 +21,63 @@ module Arboreal
 
     def populate_root_materialized_paths
       connection.update("UPDATE #{table_name} SET materialized_path = '-' WHERE parent_id IS NULL")
+    end
+
+    def populate_root_relation
+      connection.update(update_root_relation_sql)
+    end
+
+    def update_root_relation_sql
+      sql = if connection.adapter_name =~ /mysql/i
+        <<-SQL
+          UPDATE _arboreals_
+          SET root_ancestor_id =
+            IF(
+              materialized_path = '-',
+              NULL,
+              SUBSTRING_INDEX(SUBSTRING_INDEX(materialized_path, '-', 2), '-', -1
+            )
+          )
+        SQL
+      elsif connection.adapter_name =~ /sqlite/i
+        <<-SQL
+          UPDATE _arboreals_
+          SET root_ancestor_id =
+            CASE WHEN materialized_path = '-'
+              THEN
+                NULL
+              ELSE
+                SUBSTR(materialized_path, 2, instr(SUBSTR(materialized_path, 2), '-') - 1)
+              END
+        SQL
+      elsif connection.adapter_name == "JDBC" && connection.config[:url] =~ /sqlserver/
+        <<-SQL
+          UPDATE _arboreals_
+          SET root_ancestor_id =
+            CASE WHEN materialized_path = '-'
+              THEN
+                NULL
+              ELSE
+                REPLACE(
+                  SUBSTRING(materialized_path, 2, CHARINDEX('-', SUBSTRING(materialized_path, 2, LEN(materialized_path)))),
+                  '-',
+                  ''
+                )
+              END
+        SQL
+      else # PostgreSQL, most others (SQL-92)
+        <<-SQL
+          UPDATE _arboreals_
+          SET root_ancestor_id =
+            CASE WHEN materialized_path = '-'
+              THEN
+                NULL
+              ELSE
+                SUBSTRING(materialized_path from 2 for (POSITION('-' in substr(materialized_path, 2)) - 1))
+              END
+        SQL
+      end
+      sql.gsub("_arboreals_", table_name).squish
     end
 
     def extend_materialized_paths
