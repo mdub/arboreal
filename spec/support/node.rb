@@ -9,6 +9,7 @@ class Node < ActiveRecord::Base
         t.string "name"
         t.string "type"
         t.integer "parent_id"
+        t.integer "root_id"
         t.string "materialized_path"
       end
     end
