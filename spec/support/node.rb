@@ -1,7 +1,7 @@
 require 'arboreal'
 
 class Node < ActiveRecord::Base
-  acts_arboreal
+  acts_arboreal enable_root_relation: true
 
   class Migration < ActiveRecord::Migration
     def self.up
@@ -9,8 +9,8 @@ class Node < ActiveRecord::Base
         t.string "name"
         t.string "type"
         t.integer "parent_id"
-        t.integer "root_id"
         t.string "materialized_path"
+        t.integer "root_ancestor_id"
       end
     end
 
