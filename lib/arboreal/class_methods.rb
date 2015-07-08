@@ -24,54 +24,25 @@ module Arboreal
     end
 
     def populate_root_relation
-      # Unfortunately, Sqlite does not have good support for string manipulation.
-      if connection.adapter_name =~ /sqlite/i
+      if connection.adapter_name =~ /mysql/i
+        connection.update(update_root_relation_sql)
+      else
         roots.update_all(root_ancestor_id: nil)
         roots.find_each { |root| root.descendants.update_all(root_ancestor_id: root.id) }
-      else
-        connection.update(update_root_relation_sql)
       end
     end
 
     def update_root_relation_sql
-      sql = if connection.adapter_name =~ /mysql/i
-        <<-SQL
-          UPDATE _arboreals_
-          SET root_ancestor_id =
-            IF(
-              materialized_path = '-',
-              NULL,
-              SUBSTRING_INDEX(SUBSTRING_INDEX(materialized_path, '-', 2), '-', -1
-            )
+      sql = <<-SQL
+        UPDATE _arboreals_
+        SET root_ancestor_id =
+          IF(
+            materialized_path = '-',
+            NULL,
+            SUBSTRING_INDEX(SUBSTRING_INDEX(materialized_path, '-', 2), '-', -1
           )
-        SQL
-      elsif connection.adapter_name == "JDBC" && connection.config[:url] =~ /sqlserver/
-        <<-SQL
-          UPDATE _arboreals_
-          SET root_ancestor_id =
-            CASE WHEN materialized_path = '-'
-              THEN
-                NULL
-              ELSE
-                REPLACE(
-                  SUBSTRING(materialized_path, 2, CHARINDEX('-', SUBSTRING(materialized_path, 2, LEN(materialized_path)))),
-                  '-',
-                  ''
-                )
-              END
-        SQL
-      else # PostgreSQL, most others (SQL-92)
-        <<-SQL
-          UPDATE _arboreals_
-          SET root_ancestor_id =
-            CASE WHEN materialized_path = '-'
-              THEN
-                NULL
-              ELSE
-                SUBSTRING(materialized_path from 2 for (POSITION('-' in substr(materialized_path, 2)) - 1))
-              END
-        SQL
-      end
+        )
+      SQL
       sql.gsub("_arboreals_", table_name).squish
     end
 
