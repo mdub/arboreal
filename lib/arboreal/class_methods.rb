@@ -39,9 +39,8 @@ module Arboreal
           IF(
             materialized_path = '-',
             NULL,
-            SUBSTRING_INDEX(SUBSTRING_INDEX(materialized_path, '-', 2), '-', -1
+            SUBSTRING_INDEX(SUBSTRING_INDEX(materialized_path, '-', 2), '-', -1)
           )
-        )
       SQL
       sql.gsub("_arboreals_", table_name).squish
     end
