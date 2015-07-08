@@ -24,7 +24,13 @@ module Arboreal
     end
 
     def populate_root_relation
-      connection.update(update_root_relation_sql)
+      # Unfortunately, Sqlite does not have good support for string manipulation.
+      if connection.adapter_name =~ /sqlite/i
+        roots.update_all(root_ancestor_id: nil)
+        roots.find_each { |root| root.descendants.update_all(root_ancestor_id: root.id) }
+      else
+        connection.update(update_root_relation_sql)
+      end
     end
 
     def update_root_relation_sql
@@ -38,17 +44,6 @@ module Arboreal
               SUBSTRING_INDEX(SUBSTRING_INDEX(materialized_path, '-', 2), '-', -1
             )
           )
-        SQL
-      elsif connection.adapter_name =~ /sqlite/i
-        <<-SQL
-          UPDATE _arboreals_
-          SET root_ancestor_id =
-            CASE WHEN materialized_path = '-'
-              THEN
-                NULL
-              ELSE
-                SUBSTR(materialized_path, 2, instr(SUBSTR(materialized_path, 2), '-') - 1)
-              END
         SQL
       elsif connection.adapter_name == "JDBC" && connection.config[:url] =~ /sqlserver/
         <<-SQL
