@@ -340,7 +340,7 @@ describe "Arboreal hierarchy" do
         before { @melbourne.root_ancestor_id = nil }
 
         it "fetches the root from its `ancestors`" do
-          @melbourne.should_receive(:ancestors).and_call_original
+          @melbourne.should_receive(:ancestors) { [@australia, @victoria] }
           @melbourne.root.should == @australia
         end
       end
@@ -360,7 +360,7 @@ describe "Arboreal hierarchy" do
       end
 
       it "fetches the root from its `ancestors`" do
-        @child.should_receive(:ancestors).and_call_original
+        @child.should_receive(:ancestors) { [@grandparent] }
         @child.root.should == @grandparent
       end
     end
