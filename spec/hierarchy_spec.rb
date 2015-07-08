@@ -10,6 +10,10 @@ describe "Arboreal hierarchy" do
   end
 
   describe "node" do
+    it "has a `root_ancestor`" do
+      @victoria.root_ancestor.should == @australia
+    end
+
     describe "#parent" do
       it "returns the parent" do
         @victoria.parent.should == @australia
@@ -84,6 +88,10 @@ describe "Arboreal hierarchy" do
       @australia.should be_root
     end
 
+    it "does not have a `root_ancestor`" do
+      @australia.root_ancestor.should be_nil
+    end
+
     describe "#parent" do
       it "returns nil" do
         @australia.parent.should == nil
@@ -156,6 +164,10 @@ describe "Arboreal hierarchy" do
       @melbourne.should_not be_root
     end
 
+    it "has a `root_ancestor`" do
+      @melbourne.root_ancestor.should == @australia
+    end
+
     describe "#materialized_path" do
       it "contains ids of all ancestors" do
         @melbourne.materialized_path.should == "-#{@australia.id}-#{@victoria.id}-"
@@ -207,13 +219,19 @@ describe "Arboreal hierarchy" do
       @victoria.update_attributes!(:parent => @nz)
     end
 
+    it "updates it's root ancestor" do
+      @victoria.reload.root_ancestor.should == @nz
+    end
+
     describe "each descendant" do
       it "follows" do
         @melbourne.reload
+        @melbourne.root_ancestor.should == @nz
         @melbourne.ancestors.should include(@nz, @victoria)
         @melbourne.ancestors.should_not include(@australia)
 
         @box_hill.reload
+        @box_hill.root_ancestor.should == @nz
         @box_hill.ancestors.should include(@nz, @victoria, @melbourne)
         @box_hill.ancestors.should_not include(@australia)
       end
@@ -229,6 +247,10 @@ describe "Arboreal hierarchy" do
       @victoria.ancestors.should be_empty
     end
 
+    it "no longer has a `root_ancestor`" do
+      @victoria.reload.root_ancestor.should be_nil
+    end
+
     it "persists changes to the ancestors" do
       @victoria.reload.ancestors.should be_empty
     end
@@ -237,6 +259,10 @@ describe "Arboreal hierarchy" do
   describe "node created using find_or_create_by" do
     before do
       @tasmania = @australia.children.find_or_create_by_name("Tasmania")
+    end
+
+    it "has the correct `root_ancestor`" do
+      @tasmania.root_ancestor.should == @australia
     end
 
     it "still has the right ancestry" do
@@ -305,6 +331,38 @@ describe "Arboreal hierarchy" do
 
     it "has no ancestor ids" do
       new_node.ancestor_ids.should be_empty
+    end
+  end
+
+  describe "root" do
+    context "when root relation is enabled" do
+      context "when root_ancestor_id is nil" do
+        before { @melbourne.root_ancestor_id = nil }
+
+        it "fetches the root from its `ancestors`" do
+          @melbourne.should_receive(:ancestors).and_call_original
+          @melbourne.root.should == @australia
+        end
+      end
+
+      context "when root_ancestor_id is not nil" do
+        it "fetches the root from the root_ancestor relation" do
+          @melbourne.should_not_receive(:ancestors)
+          @melbourne.root.should == @australia
+        end
+      end
+    end
+
+    context "when root relation is disabled" do
+      before do
+        @grandparent = Branch.create!(name: 'Parent')
+        @child       = @grandparent.children.create!(name: 'Child')
+      end
+
+      it "fetches the root from its `ancestors`" do
+        @child.should_receive(:ancestors).and_call_original
+        @child.root.should == @grandparent
+      end
     end
   end
 end
