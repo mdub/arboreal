@@ -109,14 +109,17 @@ module Arboreal
     def apply_ancestry_change_to_descendants
       if materialized_path_changed?
         old_path_string = "#{materialized_path_was}#{id}-"
-        descendants = self.class.where("materialized_path like ?", old_path_string + "%")
-        if root_relation_enabled?
-          descendants.update_all(
-            ["root_ancestor_id = ?, materialized_path = REPLACE(materialized_path, ?, ?)", root_ancestor_id, old_path_string, path_string]
-          )
-        else
-          descendants.update_all(["materialized_path = REPLACE(materialized_path, ?, ?)", old_path_string, path_string])
-        end
+        self.class
+          .where("materialized_path like ?", old_path_string + "%")
+          .update_all(descendant_attributes_to_update(old_path_string))
+      end
+    end
+
+    def descendant_attributes_to_update(old_path_string)
+      if root_relation_enabled?
+        ["root_ancestor_id = ?, materialized_path = REPLACE(materialized_path, ?, ?)", root_ancestor_id, old_path_string, path_string]
+      else
+        ["materialized_path = REPLACE(materialized_path, ?, ?)", old_path_string, path_string]
       end
     end
   end
