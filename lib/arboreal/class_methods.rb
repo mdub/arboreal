@@ -42,7 +42,7 @@ module Arboreal
             SUBSTRING_INDEX(SUBSTRING_INDEX(materialized_path, '-', 2), '-', -1)
           )
       SQL
-      sql.gsub("_arboreals_", table_name).squish
+      sql.sub("_arboreals_", table_name).squish
     end
 
     def extend_materialized_paths
