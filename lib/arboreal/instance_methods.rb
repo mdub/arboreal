@@ -43,7 +43,7 @@ module Arboreal
     # return the root of the tree
     def root
       return self if root?
-      (root_relation_enabled? and root_ancestor) || ancestors.first
+      (root_relation_enabled? && root_ancestor) || ancestors.first
     end
 
     def ancestry_depth
