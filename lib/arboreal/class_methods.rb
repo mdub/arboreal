@@ -10,6 +10,7 @@ module Arboreal
       begin
         n_changes = extend_materialized_paths
       end until n_changes.zero?
+      populate_root_relation if reflect_on_association(:root_ancestor)
     end
     
     private
@@ -20,6 +21,28 @@ module Arboreal
 
     def populate_root_materialized_paths
       connection.update("UPDATE #{table_name} SET materialized_path = '-' WHERE parent_id IS NULL")
+    end
+
+    def populate_root_relation
+      if connection.adapter_name =~ /mysql/i
+        connection.update(update_root_relation_sql)
+      else
+        roots.update_all(root_ancestor_id: nil)
+        roots.find_each { |root| root.descendants.update_all(root_ancestor_id: root.id) }
+      end
+    end
+
+    def update_root_relation_sql
+      sql = <<-SQL
+        UPDATE _arboreals_
+        SET root_ancestor_id =
+          IF(
+            materialized_path = '-',
+            NULL,
+            SUBSTRING_INDEX(SUBSTRING_INDEX(materialized_path, '-', 2), '-', -1)
+          )
+      SQL
+      sql.sub("_arboreals_", table_name).squish
     end
 
     def extend_materialized_paths

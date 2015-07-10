@@ -24,6 +24,10 @@ describe "saving dependent objects" do
           parent.should be_persisted
         end
 
+        it "updates the child's `root_ancestor`" do
+          child.root_ancestor.should == parent
+        end
+
         it "updates the child's materialized path" do
           child.materialized_path.should eq(parent.path_string)
         end
@@ -38,6 +42,10 @@ describe "saving dependent objects" do
 
         it "also saves the child" do
           child.should be_persisted
+        end
+
+        it "updates the child's `root_ancestor`" do
+          child.root_ancestor.should == parent
         end
 
         it "updates the child's materialized path" do
@@ -61,6 +69,10 @@ describe "saving dependent objects" do
           parent.should be_persisted
         end
 
+        it "updates the child's `root_ancestor`" do
+          child.root_ancestor.should == parent
+        end
+
         it "updates the child's materialized path" do
           child.materialized_path.should eq(parent.path_string)
         end
@@ -73,6 +85,10 @@ describe "saving dependent objects" do
           parent.reload
 
           child.reload
+        end
+
+        it "updates the child's `root_ancestor`" do
+          child.root_ancestor.should == parent
         end
 
         it "updates the child's materialized path" do
@@ -99,6 +115,10 @@ describe "saving dependent objects" do
           parent.should be_persisted
         end
 
+        it "updates the child's `root_ancestor`" do
+          child.root_ancestor.should == parent
+        end
+
         it "updates the child's materialized path" do
           child.materialized_path.should eq(parent.path_string)
         end
@@ -111,6 +131,10 @@ describe "saving dependent objects" do
           parent.reload
 
           child.reload
+        end
+
+        it "updates the child's `root_ancestor`" do
+          child.root_ancestor.should == parent
         end
 
         it "updates the child's materialized path" do
@@ -133,6 +157,10 @@ describe "saving dependent objects" do
           child.reload
         end
 
+        it "updates the child's `root_ancestor`" do
+          child.root_ancestor.should == parent
+        end
+
         it "updates the child's materialized path" do
           child.materialized_path.should eq(parent.path_string)
         end
@@ -146,6 +174,10 @@ describe "saving dependent objects" do
 
         it "saves the child" do
           child.should be_persisted
+        end
+
+        it "updates the child's `root_ancestor`" do
+          child.root_ancestor.should == parent
         end
 
         it "updates the child's materialized path" do

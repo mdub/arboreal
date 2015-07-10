@@ -42,7 +42,8 @@ module Arboreal
 
     # return the root of the tree
     def root
-      root? ? self : ancestors.first
+      return self if root?
+      (root_relation_enabled? && root_ancestor) || ancestors.first
     end
 
     def ancestry_depth
@@ -57,6 +58,10 @@ module Arboreal
 
     def table_name
       self.class.table_name
+    end
+
+    def root_relation_enabled?
+      self.class.reflect_on_association(:root_ancestor).present?
     end
 
     def ancestor_conditions
@@ -83,7 +88,10 @@ module Arboreal
 
     def populate_materialized_path
       if parent_id_changed? || materialized_path.nil?
-        self.materialized_path = (parent_id && parent) ? parent.path_string : "-"
+        model_base_class.send(:with_exclusive_scope) do
+          self.root_ancestor     = parent ? parent.root : nil if root_relation_enabled?
+          self.materialized_path = parent ? parent.path_string : "-"
+        end
       end
     end
 
@@ -103,7 +111,15 @@ module Arboreal
         old_path_string = "#{materialized_path_was}#{id}-"
         self.class
           .where("materialized_path like ?", old_path_string + "%")
-          .update_all ["materialized_path = REPLACE(materialized_path, ?, ?)", old_path_string, path_string]
+          .update_all(descendant_attributes_to_update(old_path_string))
+      end
+    end
+
+    def descendant_attributes_to_update(old_path_string)
+      if root_relation_enabled?
+        ["root_ancestor_id = ?, materialized_path = REPLACE(materialized_path, ?, ?)", root_ancestor_id, old_path_string, path_string]
+      else
+        ["materialized_path = REPLACE(materialized_path, ?, ?)", old_path_string, path_string]
       end
     end
   end
