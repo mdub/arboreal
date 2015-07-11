@@ -300,7 +300,7 @@ describe "Arboreal hierarchy" do
       end
 
       it "re-populates all materialized_paths" do
-        Node.count(:conditions => {:materialized_path => 'corrupt'}).should == 0
+        Node.where(materialized_path: 'corrupt').count.should == 0
       end
 
       it "fixes the hierarchy" do

@@ -88,8 +88,8 @@ module Arboreal
 
     def populate_materialized_path
       if parent_id_changed? || materialized_path.nil?
-        self.root_ancestor     = parent ? parent.root : nil if root_relation_enabled?
-        self.materialized_path = parent ? parent.path_string : "-"        
+        self.materialized_path = parent_id && parent ? parent.path_string : "-"
+        self.root_ancestor     = parent_id && parent ? parent.root : nil if root_relation_enabled?
       end
     end
 
