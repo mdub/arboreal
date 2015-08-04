@@ -17,22 +17,22 @@ module Arboreal
 
     # return a scope matching all ancestors of this node
     def ancestors
-      model_base_class.scoped(:conditions => ancestor_conditions, :order => :materialized_path)
+      model_base_class.where(ancestor_conditions).order(:materialized_path)
     end
 
     # return a scope matching all descendants of this node
     def descendants
-      model_base_class.scoped(:conditions => descendant_conditions)
+      model_base_class.where(descendant_conditions)
     end
 
     # return a scope matching all descendants of this node, AND the node itself
     def subtree
-      model_base_class.scoped(:conditions => subtree_conditions)
+      model_base_class.where(subtree_conditions)
     end
 
     # return a scope matching all siblings of this node (NOT including the node itself)
     def siblings
-      model_base_class.scoped(:conditions => sibling_conditions)
+      model_base_class.where(sibling_conditions)
     end
 
     # return whether or not this is a root of the tree
@@ -88,10 +88,8 @@ module Arboreal
 
     def populate_materialized_path
       if parent_id_changed? || materialized_path.nil?
-        model_base_class.send(:with_exclusive_scope) do
-          self.root_ancestor     = parent ? parent.root : nil if root_relation_enabled?
-          self.materialized_path = parent ? parent.path_string : "-"
-        end
+        self.materialized_path = parent_id && parent ? parent.path_string : "-"
+        self.root_ancestor     = parent_id && parent ? parent.root : nil if root_relation_enabled?
       end
     end
 

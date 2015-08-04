@@ -4,6 +4,14 @@ describe "saving dependent objects" do
   let(:parent) { Node.new(name: "Parent") }
   let(:child) { Node.new(name: "Child") }
 
+  it "when no parent_id is present, but parent is nil" do
+    child.parent_id = 12345
+    child.parent.should be_nil
+    child.save!
+
+    child.materialized_path.should eq("-")
+  end
+
   context "when the parent has not been saved" do
     context "and the child has not been saved" do
       context "when the child is saved" do
