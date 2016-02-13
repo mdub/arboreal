@@ -257,7 +257,7 @@ describe "Arboreal hierarchy" do
     end
 
     it 'updates the root of its descendants' do
-      @victoria.descendants.pluck('DISTINCT root_ancestor_id').should == [@victoria.id]
+      @victoria.descendants.map(&:root_ancestor).uniq.should == [@victoria]
     end
   end
 
