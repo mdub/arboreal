@@ -115,7 +115,7 @@ module Arboreal
 
     def descendant_attributes_to_update(old_path_string)
       if root_relation_enabled?
-        ["root_ancestor_id = ?, materialized_path = REPLACE(materialized_path, ?, ?)", root_ancestor_id, old_path_string, path_string]
+        ["root_ancestor_id = ?, materialized_path = REPLACE(materialized_path, ?, ?)", root_ancestor_id || id, old_path_string, path_string]
       else
         ["materialized_path = REPLACE(materialized_path, ?, ?)", old_path_string, path_string]
       end

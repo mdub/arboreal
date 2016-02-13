@@ -240,6 +240,7 @@ describe "Arboreal hierarchy" do
 
   describe "when a node becomes a root" do
     before do
+      Node.create!(:name => "Southbank", :parent => @melbourne)
       @victoria.update_attribute(:parent_id, nil)
     end
 
@@ -253,6 +254,10 @@ describe "Arboreal hierarchy" do
 
     it "persists changes to the ancestors" do
       @victoria.reload.ancestors.should be_empty
+    end
+
+    it 'updates the root of its descendants' do
+      @victoria.descendants.pluck('DISTINCT root_ancestor_id').should == [@victoria.id]
     end
   end
 
