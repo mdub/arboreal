@@ -69,6 +69,7 @@ module Arboreal
     end
 
     def descendant_conditions
+      return ["1 = 0"] if new_record?
       ["#{table_name}.materialized_path LIKE ?", path_string + "%"]
     end
 
