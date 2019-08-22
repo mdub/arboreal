@@ -11,196 +11,196 @@ describe "Arboreal hierarchy" do
 
   describe "node" do
     it "has a `root_ancestor`" do
-      @victoria.root_ancestor.should == @australia
+      expect(@victoria.root_ancestor).to eq(@australia)
     end
 
     describe "#parent" do
       it "returns the parent" do
-        @victoria.parent.should == @australia
+        expect(@victoria.parent).to eq(@australia)
       end
     end
 
     describe "#children" do
       it "returns the children" do
-        @australia.children.to_set.should == [@victoria, @nsw].to_set
+        expect(@australia.children.to_set).to eq([@victoria, @nsw].to_set)
       end
     end
 
     describe "#siblings" do
       it "returns other nodes with the same parent" do
-        @victoria.siblings.should == [@nsw]
+        expect(@victoria.siblings).to eq([@nsw])
       end
     end
 
     it "cannot be it's own parent" do
-      lambda do
+      expect do
         @australia.update_attributes!(:parent => @australia)
-      end.should raise_error(ActiveRecord::RecordInvalid)
+      end.to raise_error(ActiveRecord::RecordInvalid)
     end
 
     it "cannot be it's own ancestor" do
-      lambda do
+      expect do
         @australia.update_attributes!(:parent => @melbourne)
-      end.should raise_error(ActiveRecord::RecordInvalid)
+      end.to raise_error(ActiveRecord::RecordInvalid)
     end
 
     describe "#ancestry_depth" do
       specify "root nodes are at depth 0" do
-        @australia.ancestry_depth.should == 0
+        expect(@australia.ancestry_depth).to eq(0)
       end
 
       specify "child nodes are one level deeper than their parents" do
-        @victoria.ancestry_depth.should == 1
-        @melbourne.ancestry_depth.should == 2
+        expect(@victoria.ancestry_depth).to eq(1)
+        expect(@melbourne.ancestry_depth).to eq(2)
       end
     end
 
     describe "ancestry string format" do
       it "is valid" do
-        @australia.should be_valid
+        expect(@australia).to be_valid
       end
 
       it "is not valid" do
         @australia.materialized_path = ''
-        @australia.should_not be_valid
+        expect(@australia).not_to be_valid
         @australia.materialized_path = '42'
-        @australia.should_not be_valid
+        expect(@australia).not_to be_valid
         @australia.materialized_path = '42-'
-        @australia.should_not be_valid
+        expect(@australia).not_to be_valid
         @australia.materialized_path = '--'
-        @australia.should_not be_valid
+        expect(@australia).not_to be_valid
         @australia.materialized_path = '-42'
-        @australia.should_not be_valid
+        expect(@australia).not_to be_valid
         @australia.materialized_path = '-42-58'
-        @australia.should_not be_valid
+        expect(@australia).not_to be_valid
         @australia.materialized_path = 'not ids'
-        @australia.should_not be_valid
+        expect(@australia).not_to be_valid
         @australia.materialized_path = '\''
-        @australia.should_not be_valid
+        expect(@australia).not_to be_valid
         @australia.materialized_path = '; drop table nodes'
-        @australia.should_not be_valid
+        expect(@australia).not_to be_valid
       end
     end
   end
 
   describe "root node" do
     it "is a root" do
-      @australia.should be_root
+      expect(@australia).to be_root
     end
 
     it "does not have a `root_ancestor`" do
-      @australia.root_ancestor.should be_nil
+      expect(@australia.root_ancestor).to be_nil
     end
 
     describe "#parent" do
       it "returns nil" do
-        @australia.parent.should == nil
+        expect(@australia.parent).to eq(nil)
       end
     end
 
     describe "#ancestors" do
       it "is empty" do
-        @australia.ancestors.should be_empty
+        expect(@australia.ancestors).to be_empty
       end
     end
 
     describe "#materialized_path" do
       it "is a single dash" do
-        @australia.materialized_path.should == "-"
+        expect(@australia.materialized_path).to eq("-")
       end
     end
 
     describe "#path_string" do
       it "contains only the id of the root" do
-        @australia.path_string.should == "-#{@australia.id}-"
+        expect(@australia.path_string).to eq("-#{@australia.id}-")
       end
 
       it "returns '-' for new records" do
-        Node.new.path_string.should == "-"
+        expect(Node.new.path_string).to eq("-")
       end
     end
 
     describe "#descendants" do
       it "includes children" do
-        @australia.descendants.should include(@victoria)
-        @australia.descendants.should include(@nsw)
+        expect(@australia.descendants).to include(@victoria)
+        expect(@australia.descendants).to include(@nsw)
       end
 
       it "includes grand-children" do
-        @australia.descendants.should include(@melbourne)
-        @australia.descendants.should include(@sydney)
+        expect(@australia.descendants).to include(@melbourne)
+        expect(@australia.descendants).to include(@sydney)
       end
 
       it "excludes self" do
-        @australia.descendants.should_not include(@australia)
+        expect(@australia.descendants).not_to include(@australia)
       end
     end
 
     describe "#subtree" do
       it "includes children" do
-        @australia.subtree.should include(@victoria)
-        @australia.subtree.should include(@nsw)
+        expect(@australia.subtree).to include(@victoria)
+        expect(@australia.subtree).to include(@nsw)
       end
 
       it "includes grand-children" do
-        @australia.subtree.should include(@melbourne)
-        @australia.subtree.should include(@sydney)
+        expect(@australia.subtree).to include(@melbourne)
+        expect(@australia.subtree).to include(@sydney)
       end
 
       it "includes self" do
-        @australia.subtree.should include(@australia)
+        expect(@australia.subtree).to include(@australia)
       end
     end
 
     describe "#root" do
       it "is itself" do
-        @australia.root.should == @australia
+        expect(@australia.root).to eq(@australia)
       end
     end
   end
 
   describe "leaf node" do
     it "is not a root" do
-      @melbourne.should_not be_root
+      expect(@melbourne).not_to be_root
     end
 
     it "has a `root_ancestor`" do
-      @melbourne.root_ancestor.should == @australia
+      expect(@melbourne.root_ancestor).to eq(@australia)
     end
 
     describe "#materialized_path" do
       it "contains ids of all ancestors" do
-        @melbourne.materialized_path.should == "-#{@australia.id}-#{@victoria.id}-"
+        expect(@melbourne.materialized_path).to eq("-#{@australia.id}-#{@victoria.id}-")
       end
     end
 
     describe "#path_string" do
       it "contains ids of all ancestors, plus self" do
-        @melbourne.path_string.should == "-#{@australia.id}-#{@victoria.id}-#{@melbourne.id}-"
+        expect(@melbourne.path_string).to eq("-#{@australia.id}-#{@victoria.id}-#{@melbourne.id}-")
       end
     end
 
     describe "#ancestors" do
       it "returns all ancestors, depth-first" do
-        @melbourne.ancestors.all.should == [@australia, @victoria]
+        expect(@melbourne.ancestors.all).to eq([@australia, @victoria])
       end
     end
 
     describe "#children" do
       it "returns an empty collection" do
-        @melbourne.children.should be_empty
+        expect(@melbourne.children).to be_empty
       end
     end
 
     describe "#descendants" do
       it "returns an empty collection" do
-        @melbourne.children.should be_empty
+        expect(@melbourne.children).to be_empty
       end
     end
 
     describe "#root" do
       it "is the root of the tree" do
-        @melbourne.root.should == @australia
+        expect(@melbourne.root).to eq(@australia)
       end
     end
   end
@@ -208,7 +208,7 @@ describe "Arboreal hierarchy" do
   describe ".roots" do
     it "returns root nodes" do
       @nz = Node.create!(:name => "New Zealand")
-      Node.roots.to_set.should == [@australia, @nz].to_set
+      expect(Node.roots.to_set).to eq([@australia, @nz].to_set)
     end
   end
 
@@ -220,20 +220,20 @@ describe "Arboreal hierarchy" do
     end
 
     it "updates it's root ancestor" do
-      @victoria.reload.root_ancestor.should == @nz
+      expect(@victoria.reload.root_ancestor).to eq(@nz)
     end
 
     describe "each descendant" do
       it "follows" do
         @melbourne.reload
-        @melbourne.root_ancestor.should == @nz
-        @melbourne.ancestors.should include(@nz, @victoria)
-        @melbourne.ancestors.should_not include(@australia)
+        expect(@melbourne.root_ancestor).to eq(@nz)
+        expect(@melbourne.ancestors).to include(@nz, @victoria)
+        expect(@melbourne.ancestors).not_to include(@australia)
 
         @box_hill.reload
-        @box_hill.root_ancestor.should == @nz
-        @box_hill.ancestors.should include(@nz, @victoria, @melbourne)
-        @box_hill.ancestors.should_not include(@australia)
+        expect(@box_hill.root_ancestor).to eq(@nz)
+        expect(@box_hill.ancestors).to include(@nz, @victoria, @melbourne)
+        expect(@box_hill.ancestors).not_to include(@australia)
       end
     end
   end
@@ -245,19 +245,19 @@ describe "Arboreal hierarchy" do
     end
 
     it "no longer has ancestors" do
-      @victoria.ancestors.should be_empty
+      expect(@victoria.ancestors).to be_empty
     end
 
     it "no longer has a `root_ancestor`" do
-      @victoria.reload.root_ancestor.should be_nil
+      expect(@victoria.reload.root_ancestor).to be_nil
     end
 
     it "persists changes to the ancestors" do
-      @victoria.reload.ancestors.should be_empty
+      expect(@victoria.reload.ancestors).to be_empty
     end
 
     it 'updates the root of its descendants' do
-      @victoria.descendants.map(&:root_ancestor).uniq.should == [@victoria]
+      expect(@victoria.descendants.map(&:root_ancestor).uniq).to eq([@victoria])
     end
   end
 
@@ -271,11 +271,11 @@ describe "Arboreal hierarchy" do
     end
 
     it "has the correct `root_ancestor`" do
-      @tasmania.root_ancestor.should == @australia
+      expect(@tasmania.root_ancestor).to eq(@australia)
     end
 
     it "still has the right ancestry" do
-      @tasmania.ancestors.should == [@australia]
+      expect(@tasmania.ancestors).to eq([@australia])
     end
   end
 
@@ -285,9 +285,9 @@ describe "Arboreal hierarchy" do
     end
 
     it 'does not cause a SQL injection' do
-      lambda {
+      expect {
         @melbourne.save(validate: false)
-      }.should_not raise_error
+      }.not_to raise_error
     end
   end
 
@@ -299,18 +299,18 @@ describe "Arboreal hierarchy" do
       end
 
       it "re-populates the `foreign_key` for the `root_ancestor` relation" do
-        @australia.reload.root_ancestor_id.should be_nil
-        @melbourne.reload.root_ancestor_id.should == @australia.id
-        @victoria.reload.root_ancestor_id.should == @australia.id
+        expect(@australia.reload.root_ancestor_id).to be_nil
+        expect(@melbourne.reload.root_ancestor_id).to eq(@australia.id)
+        expect(@victoria.reload.root_ancestor_id).to eq(@australia.id)
       end
 
       it "re-populates all materialized_paths" do
-        Node.where(materialized_path: 'corrupt').count.should == 0
+        expect(Node.where(materialized_path: 'corrupt').count).to eq(0)
       end
 
       it "fixes the hierarchy" do
-        @melbourne.reload.ancestors.should == [@australia, @victoria]
-        @sydney.reload.ancestors.should == [@australia, @nsw]
+        expect(@melbourne.reload.ancestors).to eq([@australia, @victoria])
+        expect(@sydney.reload.ancestors).to eq([@australia, @nsw])
       end
     end
 
@@ -325,12 +325,12 @@ describe "Arboreal hierarchy" do
       end
 
       it "re-populates all materialized_paths" do
-        Branch.where(materialized_path: 'corrupt').count.should eq(0)
+        expect(Branch.where(materialized_path: 'corrupt').count).to eq(0)
       end
 
       it "fixes the hierarchy" do
-        @child.reload.ancestors.should == [@grandparent]
-        @grandchild.reload.ancestors.should == [@grandparent, @child]
+        expect(@child.reload.ancestors).to eq([@grandparent])
+        expect(@grandchild.reload.ancestors).to eq([@grandparent, @child])
       end
     end
   end
@@ -339,7 +339,7 @@ describe "Arboreal hierarchy" do
     let(:new_node) { Node.new(name: "New node") }
 
     it "has no ancestor ids" do
-      new_node.ancestor_ids.should be_empty
+      expect(new_node.ancestor_ids).to be_empty
     end
   end
 
@@ -349,15 +349,15 @@ describe "Arboreal hierarchy" do
         before { @melbourne.root_ancestor_id = nil }
 
         it "fetches the root from its `ancestors`" do
-          @melbourne.should_receive(:ancestors) { [@australia, @victoria] }
-          @melbourne.root.should == @australia
+          expect(@melbourne).to receive(:ancestors) { [@australia, @victoria] }
+          expect(@melbourne.root).to eq(@australia)
         end
       end
 
       context "when root_ancestor_id is not nil" do
         it "fetches the root from the root_ancestor relation" do
-          @melbourne.should_not_receive(:ancestors)
-          @melbourne.root.should == @australia
+          expect(@melbourne).not_to receive(:ancestors)
+          expect(@melbourne.root).to eq(@australia)
         end
       end
     end
@@ -369,8 +369,8 @@ describe "Arboreal hierarchy" do
       end
 
       it "fetches the root from its `ancestors`" do
-        @child.should_receive(:ancestors) { [@grandparent] }
-        @child.root.should == @grandparent
+        expect(@child).to receive(:ancestors) { [@grandparent] }
+        expect(@child.root).to eq(@grandparent)
       end
     end
   end
