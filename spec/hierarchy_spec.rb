@@ -325,7 +325,7 @@ describe "Arboreal hierarchy" do
       end
 
       it "re-populates all materialized_paths" do
-        Branch.where(materialized_path: 'corrupt').should have(0).items
+        Branch.where(materialized_path: 'corrupt').count.should eq(0)
       end
 
       it "fixes the hierarchy" do
