@@ -12,3 +12,4 @@ rvm:
 gemfile:
   - gemfiles/activerecord-4.2
   - gemfiles/activerecord-5.0
+  - gemfiles/activerecord-5.1
