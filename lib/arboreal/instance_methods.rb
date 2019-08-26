@@ -1,7 +1,9 @@
 require "active_support/core_ext/string/filters"
+require "arboreal/compatible_active_record"
 
 module Arboreal
   module InstanceMethods
+    include CompatibleActiveRecord
 
     def path_string
       if new_record?
@@ -105,8 +107,8 @@ module Arboreal
     end
 
     def apply_ancestry_change_to_descendants
-      if materialized_path_changed?
-        old_path_string = "#{materialized_path_was}#{id}-"
+      if materialized_path_has_changed?
+        old_path_string = "#{materialized_path_previous_value}#{id}-"
         self.class
           .where("materialized_path like ?", old_path_string + "%")
           .update_all(descendant_attributes_to_update(old_path_string))
@@ -119,6 +121,20 @@ module Arboreal
       else
         ["materialized_path = REPLACE(materialized_path, ?, ?)", old_path_string, path_string]
       end
+    end
+
+    def materialized_path_has_changed?
+      when_active_record_version(
+        current: lambda { materialized_path_changed? },
+        future: lambda { saved_change_to_attribute?(:materialized_path) }
+      )
+    end
+
+    def materialized_path_previous_value
+      when_active_record_version(
+        current: lambda { materialized_path_was },
+        future: lambda { attribute_before_last_save(:materialized_path) }
+      )
     end
   end
 end

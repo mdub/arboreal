@@ -1,8 +1,13 @@
 require 'active_record'
+require 'arboreal/compatible_active_record'
 
 module CompatibleMigration
+  include Arboreal::CompatibleActiveRecord
+
   def base_migration_klass
-    ActiveRecord.gem_version > Gem::Version.new("5.1") ?
-      ActiveRecord::Migration[4.2] : ActiveRecord::Migration
+    when_active_record_version(
+      current: -> { ActiveRecord::Migration },
+      future: -> { ActiveRecord::Migration[4.2] }
+    )
   end
 end

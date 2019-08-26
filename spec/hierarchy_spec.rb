@@ -214,7 +214,11 @@ describe "Arboreal hierarchy" do
 
   describe "when a node changes parent" do
     before do
-      @box_hill = Node.create!(:name => "Box Hill", :parent => @melbourne)
+      expect(@melbourne.ancestors).to include(@australia, @victoria)
+
+      @box_hill = Node.create!(:name => "Box Hill", :parent_id => @melbourne.id)
+      expect(@box_hill.ancestors).to include(@australia, @victoria, @melbourne)
+
       @nz = Node.create!(:name => "New Zealand")
       @victoria.update_attributes!(:parent => @nz)
     end
