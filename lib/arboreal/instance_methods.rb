@@ -1,5 +1,5 @@
 require "active_support/core_ext/string/filters"
-require "arboreal/compatible_active_record"
+require "compatible_active_record"
 
 module Arboreal
   module InstanceMethods
