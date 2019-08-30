@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
   s.name             = "arboreal"
   s.version          = Arboreal::VERSION.dup
   s.platform         = Gem::Platform::RUBY
-  s.required_ruby_version = ">= 2.3.0"
+  s.required_ruby_version = ">= 2.2.0"
   s.summary          = "Efficient tree structures for ActiveRecord"
   s.description      = description
   s.author           = "Mike Williams"
