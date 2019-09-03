@@ -9,19 +9,19 @@ describe "polymorphic hierarchy" do
 
   describe "#descendants" do
     it "includes nodes of other types" do
-      @red.descendants.should include(@green, @blue)
+      expect(@red.descendants).to include(@green, @blue)
     end
   end
 
   describe "#subtree" do
     it "includes nodes of other types" do
-      @red.subtree.should include(@red, @green, @blue)
+      expect(@red.subtree).to include(@red, @green, @blue)
     end
   end
 
   describe "#ancestors" do
     it "includes nodes of other types" do
-      @blue.ancestors.should include(@red, @green)
+      expect(@blue.ancestors).to include(@red, @green)
     end
   end
 end

@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
   s.name             = "arboreal"
   s.version          = Arboreal::VERSION.dup
   s.platform         = Gem::Platform::RUBY
-  s.required_ruby_version = ">= 1.9.3"
+  s.required_ruby_version = ">= 2.2.0"
   s.summary          = "Efficient tree structures for ActiveRecord"
   s.description      = description
   s.author           = "Mike Williams"
@@ -25,6 +25,6 @@ Gem::Specification.new do |s|
   s.rdoc_options     = ["--title", "Arboreal", "--main", "README.rdoc"]
   s.require_path     = "lib"
   s.files            = Dir["lib/**/*", "spec/**/*", "Rakefile"] + s.extra_rdoc_files
-  s.add_runtime_dependency("activerecord", "> 3.1")
-  s.add_runtime_dependency("activesupport", "> 3.1")
+  s.add_runtime_dependency("activerecord", ">= 4.2")
+  s.add_runtime_dependency("activesupport", ">= 4.2")
 end

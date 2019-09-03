@@ -1,9 +1,11 @@
 require 'arboreal'
+require_relative 'compatible_migration'
 
 class Branch < ActiveRecord::Base
+  extend CompatibleMigration
   acts_arboreal
 
-  class Migration < ActiveRecord::Migration
+  class Migration < base_migration_klass
     def self.up
       create_table "branches", :force => true do |t|
         t.string  "name"

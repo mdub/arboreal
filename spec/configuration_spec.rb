@@ -11,20 +11,20 @@ describe "configuration of relations" do
     end
 
     it "allows the user to provide options to the has_many `children` relation" do
-      children_relation(CustomizedNode).options.should include(autosave: true)
-      children_relation(CustomizedNode).options.should include(dependent: :destroy)
+      expect(children_relation(CustomizedNode).options).to include(autosave: true)
+      expect(children_relation(CustomizedNode).options).to include(dependent: :destroy)
     end
 
     it "allows the user to provide options to the belongs_to `parent` relation" do
-      parent_relation(CustomizedNode).options.should include(touch: true)
+      expect(parent_relation(CustomizedNode).options).to include(touch: true)
     end
 
     it "includes the `root_ancestor` relation" do
-      root_ancestor_relation(CustomizedNode).should_not be_nil
+      expect(root_ancestor_relation(CustomizedNode)).not_to be_nil
     end
 
     it "allows the user to provide options to the belongs_to `root_ancestor` relation" do
-      root_ancestor_relation(CustomizedNode).options.should include(touch: true)
+      expect(root_ancestor_relation(CustomizedNode).options).to include(touch: true)
     end
   end
 
@@ -36,15 +36,15 @@ describe "configuration of relations" do
     end
 
     it "allows the user to provide options to the has_many `children` relation" do
-      children_relation(CustomizedBranch).options.should include(dependent: :destroy)
+      expect(children_relation(CustomizedBranch).options).to include(dependent: :destroy)
     end
 
     it "allows the user to provide options to the belongs_to `parent` relation" do
-      parent_relation(CustomizedBranch).options.should include(touch: true)
+      expect(parent_relation(CustomizedBranch).options).to include(touch: true)
     end
 
     it "does not include the `root_ancestor` relation" do
-      root_ancestor_relation(CustomizedBranch).should be_nil
+      expect(root_ancestor_relation(CustomizedBranch)).to be_nil
     end
   end
 

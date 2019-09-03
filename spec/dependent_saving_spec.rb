@@ -6,10 +6,10 @@ describe "saving dependent objects" do
 
   it "when no parent_id is present, but parent is nil" do
     child.parent_id = 12345
-    child.parent.should be_nil
+    expect(child.parent).to be_nil
     child.save!
 
-    child.materialized_path.should eq("-")
+    expect(child.materialized_path).to eq("-")
   end
 
   context "when the parent has not been saved" do
@@ -21,15 +21,15 @@ describe "saving dependent objects" do
         end
 
         it "also saves the parent" do
-          parent.should be_persisted
+          expect(parent).to be_persisted
         end
 
         it "updates the child's `root_ancestor`" do
-          child.root_ancestor.should == parent
+          expect(child.root_ancestor).to eq(parent)
         end
 
         it "updates the child's materialized path" do
-          child.materialized_path.should eq(parent.path_string)
+          expect(child.materialized_path).to eq(parent.path_string)
         end
       end
 
@@ -41,15 +41,15 @@ describe "saving dependent objects" do
         end
 
         it "also saves the child" do
-          child.should be_persisted
+          expect(child).to be_persisted
         end
 
         it "updates the child's `root_ancestor`" do
-          child.root_ancestor.should == parent
+          expect(child.root_ancestor).to eq(parent)
         end
 
         it "updates the child's materialized path" do
-          child.materialized_path.should eq(parent.path_string)
+          expect(child.materialized_path).to eq(parent.path_string)
         end
       end
     end
@@ -66,15 +66,15 @@ describe "saving dependent objects" do
         end
 
         it "also saves the parent" do
-          parent.should be_persisted
+          expect(parent).to be_persisted
         end
 
         it "updates the child's `root_ancestor`" do
-          child.root_ancestor.should == parent
+          expect(child.root_ancestor).to eq(parent)
         end
 
         it "updates the child's materialized path" do
-          child.materialized_path.should eq(parent.path_string)
+          expect(child.materialized_path).to eq(parent.path_string)
         end
       end
 
@@ -88,11 +88,11 @@ describe "saving dependent objects" do
         end
 
         it "updates the child's `root_ancestor`" do
-          child.root_ancestor.should == parent
+          expect(child.root_ancestor).to eq(parent)
         end
 
         it "updates the child's materialized path" do
-          child.materialized_path.should eq(parent.path_string)
+          expect(child.materialized_path).to eq(parent.path_string)
         end
       end
     end
@@ -112,15 +112,15 @@ describe "saving dependent objects" do
         end
 
         it "also saves the new parent" do
-          parent.should be_persisted
+          expect(parent).to be_persisted
         end
 
         it "updates the child's `root_ancestor`" do
-          child.root_ancestor.should == parent
+          expect(child.root_ancestor).to eq(parent)
         end
 
         it "updates the child's materialized path" do
-          child.materialized_path.should eq(parent.path_string)
+          expect(child.materialized_path).to eq(parent.path_string)
         end
       end
 
@@ -134,11 +134,11 @@ describe "saving dependent objects" do
         end
 
         it "updates the child's `root_ancestor`" do
-          child.root_ancestor.should == parent
+          expect(child.root_ancestor).to eq(parent)
         end
 
         it "updates the child's materialized path" do
-          child.materialized_path.should eq(parent.path_string)
+          expect(child.materialized_path).to eq(parent.path_string)
         end
       end
     end
@@ -158,11 +158,11 @@ describe "saving dependent objects" do
         end
 
         it "updates the child's `root_ancestor`" do
-          child.root_ancestor.should == parent
+          expect(child.root_ancestor).to eq(parent)
         end
 
         it "updates the child's materialized path" do
-          child.materialized_path.should eq(parent.path_string)
+          expect(child.materialized_path).to eq(parent.path_string)
         end
       end
 
@@ -173,15 +173,15 @@ describe "saving dependent objects" do
         end
 
         it "saves the child" do
-          child.should be_persisted
+          expect(child).to be_persisted
         end
 
         it "updates the child's `root_ancestor`" do
-          child.root_ancestor.should == parent
+          expect(child.root_ancestor).to eq(parent)
         end
 
         it "updates the child's materialized path" do
-          child.materialized_path.should eq(parent.path_string)
+          expect(child.materialized_path).to eq(parent.path_string)
         end
       end
     end

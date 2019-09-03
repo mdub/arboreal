@@ -1,9 +1,11 @@
 require 'arboreal'
+require_relative 'compatible_migration'
 
 class Node < ActiveRecord::Base
+  extend CompatibleMigration
   acts_arboreal enable_root_relation: true
 
-  class Migration < ActiveRecord::Migration
+  class Migration < base_migration_klass
     def self.up
       create_table "nodes", :force => true do |t|
         t.string "name"
